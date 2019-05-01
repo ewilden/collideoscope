@@ -22,6 +22,10 @@ centerLight.position.set(0, 0, -3);
 const ambient = new THREE.AmbientLight(0xffffff);
 scene.add(ambient);
 
+// addKeyAction takes a {key, keyCode}, onDown function, and onUp function, 
+// and together with the later addEventListener calls, makes it so that
+// onDown is called when the key is first pressed, and onUp
+// is called when the key is released. Actions are not resent by holding the key.
 const keyActions = [];
 function addKeyAction(keySpec, onDown, onUp) {
     const action = {
@@ -55,13 +59,13 @@ aka(
 );
 aka(
     ArrowDown,
-    event => { velZ += 0.05; },
     event => { velZ -= 0.05; },
+    event => { velZ += 0.05; },
 );
 aka(
     ArrowUp,
-    event => { velZ -= 0.05; },
     event => { velZ += 0.05; },
+    event => { velZ -= 0.05; },
 );
 
 
@@ -98,7 +102,7 @@ function animate() {
     requestAnimationFrame(animate);
 
     // update cylinder
-    cylinder.position.z -= velZ;
+    cylinder.position.z += velZ;
     cylinder.rotation.y += rotY;
 
     renderer.render(scene, camera);
