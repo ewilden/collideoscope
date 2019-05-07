@@ -1,6 +1,6 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 3;
+camera.position.z = 5;
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -10,16 +10,16 @@ document.body.appendChild(renderer.domElement);
 const sceneObjects = [];
 sceneObjects.push(NewEnclosingCylinder());
 
-const barrier1 = NewBarrier(0, 2 * Math.PI * 3 / 6);
-barrier1.position.z = 1;
+const barrier1 = NewBarrier(1 / 2, 0);
+barrier1.position.z = 2;
 sceneObjects.push(barrier1);
 
-const barrier2 = NewBarrier(0, 2 * Math.PI * 4 / 6);
+const barrier2 = NewBarrier(1 / 3, Math.PI / 2);
 barrier2.position.z = 0;
 sceneObjects.push(barrier2);
 
-const barrier3 = NewBarrier(0, 2 * Math.PI * 5 / 6);
-barrier3.position.z = -1;
+const barrier3 = NewBarrier(1 / 6, Math.PI / 8);
+barrier3.position.z = -2;
 sceneObjects.push(barrier3);
 
 sceneObjects.forEach(obj => scene.add(obj));
