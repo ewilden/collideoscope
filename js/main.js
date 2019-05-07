@@ -10,15 +10,18 @@ document.body.appendChild(renderer.domElement);
 const sceneObjects = [];
 sceneObjects.push(NewEnclosingCylinder());
 
-const barrier1 = NewBarrier(1 / 2, 0);
+// const barrier1 = NewBarrier(1 / 2, 0);
+const barrier1 = NewPieBarrier(3, 0);
 barrier1.position.z = 2;
 sceneObjects.push(barrier1);
 
-const barrier2 = NewBarrier(1 / 3, Math.PI / 2);
+// const barrier2 = NewBarrier(1 / 3, Math.PI / 2);
+const barrier2 = NewPieBarrier(4, Math.PI / 2);
 barrier2.position.z = 0;
 sceneObjects.push(barrier2);
 
-const barrier3 = NewBarrier(1 / 6, Math.PI / 8);
+// const barrier3 = NewBarrier(1 / 6, Math.PI / 8);
+const barrier3 = NewPieBarrier(5, Math.PI / 8);
 barrier3.position.z = -2;
 sceneObjects.push(barrier3);
 
@@ -151,7 +154,7 @@ function animate() {
     // the scene moves itself toward the camera,
     // and rotates around the camera viewing axis.
     sceneObjects.forEach(obj => {
-        obj.rotation.y += rotZ;
+        obj.rotation.z += rotZ;
         obj.position.z += velZ;
     })
 
