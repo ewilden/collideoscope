@@ -1,17 +1,31 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 3;
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-var geometry = new THREE.BoxGeometry(1, 1, 1);
-var material = new THREE.MeshLambertMaterial({ color: 0xffffff });
-var cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+// set up objects in scene
+const cylinder = NewEnclosingCylinder();
+scene.add(cylinder);
+cylinder.rotation.y += Math.PI / 6;
+cylinder.rotation.x += Math.PI / 2;
 
-camera.position.z = 5;
+// set up lights
+const pointLight = new THREE.PointLight(0xff5588, 1, 100);
+scene.add(pointLight);
+pointLight.position.set(4, 4, 4);
+const centerLight = new THREE.PointLight(0x1111ff, 1, 100);
+scene.add(centerLight);
+centerLight.position.set(0, 0, -3);
+const ambient = new THREE.AmbientLight(0xffffff);
+scene.add(ambient);
 
+// addKeyAction takes a {key, keyCode}, onDown function, and onUp function, 
+// and together with the later addEventListener calls, makes it so that
+// onDown is called when the key is first pressed, and onUp
+// is called when the key is released. Actions are not resent by holding the key.
 const keyActions = [];
 function addKeyAction(keySpec, onDown, onUp) {
     const action = {
@@ -22,58 +36,34 @@ function addKeyAction(keySpec, onDown, onUp) {
     };
     keyActions.push(action);
 }
-const aka = addKeyAction;
-const ArrowLeft = { key: "ArrowLeft", keyCode: 37 };
-const ArrowRight = { key: "ArrowRight", keyCode: 39 };
-const ArrowUp = { key: "ArrowUp", keyCode: 38 };
-const ArrowDown = { key: "ArrowDown", keyCode: 40 };
-// const light = new THREE.(0x404040);
-const pointLight = new THREE.PointLight(0xff5588, 1, 100);
-// light.position.set(50, 50, 50);
-scene.add(pointLight);
-pointLight.position.set(4, 4, 4);
-const ambient = new THREE.AmbientLight(0x7070dd);
-scene.add(ambient);
-
-let rotY = 0;
-let rotX = 0;
 
 // add key actions
-aka(
-    ArrowLeft,
-    event => {
-        rotY -= 0.05;
-    },
-    event => { rotY += 0.05; },
-);
-aka(
-    ArrowRight,
-    event => { rotY += 0.05; },
-    event => { rotY -= 0.05; },
-);
-aka(
-    ArrowDown,
-    event => { rotX += 0.05; },
-    event => { rotX -= 0.05; },
-);
-aka(
-    ArrowUp,
-    event => { rotX -= 0.05; },
-    event => { rotX += 0.05; },
-);
+const aka = addKeyAction;
+const ArrowLeft = { key: "ArrowLeft", keyCode: 37, isPressed: false };
+const ArrowRight = { key: "ArrowRight", keyCode: 39, isPressed: false };
+const ArrowUp = { key: "ArrowUp", keyCode: 38, isPressed: false };
+const ArrowDown = { key: "ArrowDown", keyCode: 40, isPressed: false };
 
+function watchKey(keyObj) {
+    aka(
+        keyObj,
+        event => { keyObj.isPressed = true },
+        event => { keyObj.isPressed = false },
+    );
+}
+[ArrowLeft, ArrowRight, ArrowDown, ArrowUp].forEach(watchKey);
 
 document.addEventListener('keydown', (event) => {
     keyActions.forEach((action) => {
         const { keySpec, onDown, isRepeat } = action;
         const { key, keyCode } = keySpec;
         if (event.key == key || event.keyCode == keyCode) {
+            event.preventDefault();
             if (isRepeat) {
                 return;
             } else {
                 action.isRepeat = true;
             }
-            event.preventDefault();
             onDown(event);
         }
     });
@@ -91,13 +81,27 @@ document.addEventListener('keyup', (event) => {
     })
 });
 
-
+// animate/render loop
 function animate() {
     requestAnimationFrame(animate);
 
-    // update cube
-    cube.rotation.x += rotX;
-    cube.rotation.y += rotY;
+    // update cylinder
+    let velZ = 0;
+    let rotY = 0;
+    if (ArrowUp.isPressed) {
+        velZ += 0.05;
+    }
+    if (ArrowDown.isPressed) {
+        velZ += -0.05;
+    }
+    if (ArrowRight.isPressed) {
+        rotY += -0.05;
+    }
+    if (ArrowLeft.isPressed) {
+        rotY += 0.05;
+    }
+    cylinder.position.z += velZ;
+    cylinder.rotation.y += rotY;
 
     renderer.render(scene, camera);
 }
