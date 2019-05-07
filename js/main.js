@@ -39,35 +39,19 @@ function addKeyAction(keySpec, onDown, onUp) {
 
 // add key actions
 const aka = addKeyAction;
-const ArrowLeft = { key: "ArrowLeft", keyCode: 37 };
-const ArrowRight = { key: "ArrowRight", keyCode: 39 };
-const ArrowUp = { key: "ArrowUp", keyCode: 38 };
-const ArrowDown = { key: "ArrowDown", keyCode: 40 };
+const ArrowLeft = { key: "ArrowLeft", keyCode: 37, isPressed: false };
+const ArrowRight = { key: "ArrowRight", keyCode: 39, isPressed: false };
+const ArrowUp = { key: "ArrowUp", keyCode: 38, isPressed: false };
+const ArrowDown = { key: "ArrowDown", keyCode: 40, isPressed: false };
 
-let rotY = 0;
-let velZ = 0;
-
-aka(
-    ArrowLeft,
-    event => { rotY -= 0.05; },
-    event => { rotY += 0.05; },
-);
-aka(
-    ArrowRight,
-    event => { rotY += 0.05; },
-    event => { rotY -= 0.05; },
-);
-aka(
-    ArrowDown,
-    event => { velZ -= 0.05; },
-    event => { velZ += 0.05; },
-);
-aka(
-    ArrowUp,
-    event => { velZ += 0.05; },
-    event => { velZ -= 0.05; },
-);
-
+function watchKey(keyObj) {
+    aka(
+        keyObj,
+        event => { keyObj.isPressed = true },
+        event => { keyObj.isPressed = false },
+    );
+}
+[ArrowLeft, ArrowRight, ArrowDown, ArrowUp].forEach(watchKey);
 
 document.addEventListener('keydown', (event) => {
     keyActions.forEach((action) => {
@@ -102,6 +86,20 @@ function animate() {
     requestAnimationFrame(animate);
 
     // update cylinder
+    let velZ = 0;
+    let rotY = 0;
+    if (ArrowUp.isPressed) {
+        velZ += 0.05;
+    }
+    if (ArrowDown.isPressed) {
+        velZ += -0.05;
+    }
+    if (ArrowRight.isPressed) {
+        rotY += -0.05;
+    }
+    if (ArrowLeft.isPressed) {
+        rotY += 0.05;
+    }
     cylinder.position.z += velZ;
     cylinder.rotation.y += rotY;
 
