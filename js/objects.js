@@ -1,10 +1,11 @@
 const CYLINDER_RADIUS = 1;
+const CYLINDER_HEIGHT = 20;
 
 function NewEnclosingCylinder() {
     const geometry = new THREE.CylinderGeometry(
         CYLINDER_RADIUS, // radiusTop
         CYLINDER_RADIUS, // radiusBottom
-        20, // height
+        CYLINDER_HEIGHT, // height
         32, // radialSegments
         1, // heightSegments
         true // openEnded
@@ -15,6 +16,29 @@ function NewEnclosingCylinder() {
     cylinder.rotation.x += Math.PI / 2;
     const group = new THREE.Group();
     group.add(cylinder);
+
+    // add wall lines
+    const numWallLines = 12;
+    const lineRadius = 0.01;
+    for (let i = 0; i < numWallLines; ++i) {
+        const lineGeo = new THREE.CylinderGeometry(
+            lineRadius,
+            lineRadius,
+            CYLINDER_HEIGHT,
+            8,
+            1,
+            true
+        );
+        const lineMat = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 1.0 });
+        lineMat.side = THREE.FrontSide;
+        const lineCylinder = new THREE.Mesh(lineGeo, lineMat);
+        lineCylinder.rotation.x += Math.PI / 2;
+        const theta = 2 * Math.PI * i / 12;
+        lineCylinder.position.x = 0.99 * CYLINDER_RADIUS * Math.cos(theta);
+        lineCylinder.position.y = 0.99 * CYLINDER_RADIUS * Math.sin(theta);
+        group.add(lineCylinder);
+    }
+
     return group;
 }
 
