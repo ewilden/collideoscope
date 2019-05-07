@@ -59,8 +59,33 @@ function NewBarrier(
     return group;
 }
 
-const ODD_TEST_MAT = () => new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.5 });
-const EVEN_TEST_MAT = () => new THREE.MeshStandardMaterial({ color: 0xEEEEEE, metalness: 0.5 });
+const OddTexture = () => {
+    const texture = new THREE.CanvasTexture(
+        textureCanvas,
+        THREE.UVMapping,
+    );
+    texture.wrapS = THREE.RepeatWrapping;
+    return texture;
+}
+const EvenTexture = () => {
+    const texture = OddTexture();
+    texture.repeat.x = -1;
+    return texture;
+}
+
+const ODD_TEST_MAT = () => new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.5, map: OddTexture() });
+const EVEN_TEST_MAT = () => {
+    return new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.5, map: EvenTexture() });
+};
+
+const TOTAL_NUM_SLICES = 12;
+const FLIPMATRIX = new THREE.Matrix4();
+FLIPMATRIX.set(
+    -1, 0, 0, 0,
+    0, -1, 0, 0,
+    0, 0, -1, 0,
+    0, 0, 0, 1,
+);
 
 function NewPieBarrier(
     numSlices, // how many 1/6-th slices are in the barrier
@@ -68,18 +93,20 @@ function NewPieBarrier(
 ) {
     const barrierRadius = CYLINDER_RADIUS * 0.99;
     const slices = [];
-    const sliceAngle = Math.PI / 3;
+    const sliceAngle = 2 * Math.PI / TOTAL_NUM_SLICES;
     for (let i = 0; i < numSlices; ++i) {
-        const geometry = new THREE.CylinderGeometry(barrierRadius, barrierRadius, 1, 32, 1, false, sliceAngle * i, sliceAngle);
+        const geometry = new THREE.CylinderGeometry(barrierRadius, barrierRadius, 1, 32, 1, false, 0, sliceAngle);
         const material = i % 2 == 0 ? ODD_TEST_MAT() : EVEN_TEST_MAT();
-        material.side = THREE.FrontSide;
+        // const material = EVEN_TEST_MAT();
+        material.side = THREE.DoubleSide;
         const cylinder = new THREE.Mesh(geometry, material);
         cylinder.rotation.x += Math.PI / 2;
+        cylinder.rotation.y += sliceAngle * i;
         slices.push(cylinder);
     }
     const group = new THREE.Group();
     slices.forEach(slice => group.add(slice));
-    const gapFraction = 1 - numSlices / 6;
+    const gapFraction = 1 - numSlices / TOTAL_NUM_SLICES;
     group.rotation.z += gapFraction * Math.PI + Math.PI / 2 + gapPosition;
     return group;
 }

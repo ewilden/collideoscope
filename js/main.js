@@ -11,7 +11,7 @@ const sceneObjects = [];
 sceneObjects.push(NewEnclosingCylinder());
 
 // const barrier1 = NewBarrier(1 / 2, 0);
-const barrier1 = NewPieBarrier(3, 0);
+const barrier1 = NewPieBarrier(12, 0);
 barrier1.position.z = 2;
 sceneObjects.push(barrier1);
 
@@ -37,7 +37,7 @@ scene.add(pointLight);
 pointLight.position.set(4, 4, 4);
 const centerLight = new THREE.PointLight(0x1111ff, 1, 100);
 scene.add(centerLight);
-centerLight.position.set(0, 0, -3);
+centerLight.position.set(0, 0, -5);
 const ambient = new THREE.AmbientLight(0xffffff);
 scene.add(ambient);
 

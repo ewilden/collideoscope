@@ -1,4 +1,7 @@
-const canvas = document.getElementById('canvas');
+const canvas = document.createElement('canvas');
+canvas.width = 1024;
+canvas.height = 1024;
+const textureCanvas = canvas;
 const ctx = canvas.getContext('2d');
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -8,7 +11,7 @@ function Point(x, y) {
     this.y = y;
 }
 
-Point.prototype.step = function(dx, dy) {
+Point.prototype.step = function (dx, dy) {
     this.x += dx;
     this.y += dy;
 }
@@ -20,7 +23,7 @@ function Triangle(p1, p2, p3, color) {
     this.colorString = color;
 }
 
-Triangle.prototype.draw = function() {
+Triangle.prototype.draw = function () {
     ctx.beginPath();
     ctx.moveTo(this.p1.x, this.p1.y);
     ctx.lineTo(this.p2.x, this.p2.y);
@@ -31,7 +34,7 @@ Triangle.prototype.draw = function() {
     ctx.fill();
 }
 
-Triangle.prototype.step = function() {
+Triangle.prototype.step = function () {
     this.p1.step(1, 1);
     this.p2.step(1, 1);
     this.p3.step(1, 1);
@@ -41,7 +44,7 @@ function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
     for (var i = 0; i < 6; i++) {
-	color += letters[Math.floor(Math.random() * 16)];
+        color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
 }
@@ -63,9 +66,9 @@ function randomTriangle() {
 function fillCanvas(n) {
     var triangles = []
     for (var i = 0; i < n; i++) {
-	let tri = randomTriangle();
-	tri.draw();
-	triangles.push(tri);
+        let tri = randomTriangle();
+        tri.draw();
+        triangles.push(tri);
     }
 }
 
