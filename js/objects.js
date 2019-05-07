@@ -83,3 +83,10 @@ function NewPieBarrier(
     group.rotation.z += gapFraction * Math.PI + Math.PI / 2 + gapPosition;
     return group;
 }
+
+function NewPlayer() {
+    const geometry = new THREE.SphereGeometry(0.2, 12, 12);
+    const material = new THREE.MeshStandardMaterial({ color: 0xFF0000, metalness: 0.5 });
+    const player = new THREE.Mesh(geometry, material);
+    return player;
+}

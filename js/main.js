@@ -27,6 +27,10 @@ sceneObjects.push(barrier3);
 
 sceneObjects.forEach(obj => scene.add(obj));
 
+const player = NewPlayer();
+player.position.z = 4;
+scene.add(player);
+
 // set up lights
 const pointLight = new THREE.PointLight(0xff5588, 1, 100);
 scene.add(pointLight);
@@ -147,16 +151,15 @@ function animate() {
         velY -= 0.05;
     }
 
-    camera.position.x += velX;
-    camera.position.y += velY;
-
     // rather than moving the camera into the scene, 
     // the scene moves itself toward the camera,
     // and rotates around the camera viewing axis.
     sceneObjects.forEach(obj => {
         obj.rotation.z += rotZ;
         obj.position.z += velZ;
-    })
+    });
+    player.position.x += velX;
+    player.position.y += velY;
 
     renderer.render(scene, camera);
 }
