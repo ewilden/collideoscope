@@ -71,6 +71,8 @@ const KaleidoscopeMaterial = () => {
     return mat;
 }
 
+const SingletonMaterial = KaleidoscopeMaterial();
+
 const TOTAL_NUM_SLICES = 12;
 const SLICE_ANGLE = 2 * Math.PI / TOTAL_NUM_SLICES;
 const REFLECTION_MATRIX = new THREE.Matrix4().makeRotationY(- SLICE_ANGLE / 2)
@@ -87,7 +89,7 @@ function NewPieBarrier(
 
     for (let i = 0; i < numSlices; ++i) {
         const geometry = new THREE.CylinderGeometry(barrierRadius, barrierRadius, 1, 32, 1, false, 0, sliceAngle);
-        const material = KaleidoscopeMaterial();
+        const material = SingletonMaterial;
         const cylinder = new THREE.Mesh(geometry, material);
 
         // this is where the kaleidoscope effect comes in!

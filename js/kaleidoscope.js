@@ -178,11 +178,20 @@ Simulation.prototype.updatePositions = function () {
     }
 }
 
-let animate = function () {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    sim.drawShapes();
-    sim.updatePositions();
-    window.requestAnimationFrame(animate);
+let animate;
+if (IS_KALEIDOSCOPE_SIM) {
+    animate = function () {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        sim.drawShapes();
+        sim.updatePositions();
+        window.requestAnimationFrame(animate);
+    }
+} else {
+    animate = function () {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        sim.drawShapes();
+        sim.updatePositions();
+    }
 }
 
 sim = new Simulation(40);

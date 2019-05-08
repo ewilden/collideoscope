@@ -162,13 +162,11 @@ function mainAnimationLoop() {
         obj.rotation.z += rotZ;
         obj.position.z += velZ;
     });
-    // barriers.forEach(b => {
-    //     // b.children.forEach(child => child.material.map.needsUpdate = true);
-    //     // console.log(b);
-    // })
     player.position.x += velX;
     player.position.y += velY;
 
     renderer.render(scene, camera);
+    animate();
+    barriers.forEach(b => b.children.forEach(child => child.material.map.needsUpdate = true));
 }
 mainAnimationLoop();
