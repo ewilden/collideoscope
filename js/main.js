@@ -27,8 +27,10 @@ for (let i = 0; i < NUM_STARTING_BARRIERS; ++i) {
 enclosingCylinders.forEach(obj => scene.add(obj));
 barriers.forEach(obj => scene.add(obj));
 
+const CAMERA_DISTANCE_FROM_PLAYER = 1;
+
 const player = NewPlayer();
-player.position.z = camera.position.z - 1;
+player.position.z = camera.position.z - CAMERA_DISTANCE_FROM_PLAYER;
 scene.add(player);
 
 // set up lights
@@ -163,16 +165,10 @@ function mainAnimationLoop() {
         velY -= 0.05;
     }
 
-    // rather than moving the camera into the scene, 
-    // the scene moves itself toward the camera,
-    // and rotates around the camera viewing axis.
-    enclosingCylinders.forEach(obj => {
-        obj.rotation.z += rotZ;
-        obj.position.z += velZ;
-    });
-    barriers.forEach(obj => {
-        obj.rotation.z += rotZ;
-        obj.position.z += velZ;
+    // move the camera, lights, and player
+    [camera, player, cameraLight].forEach(obj => {
+        obj.rotation.z -= rotZ;
+        obj.position.z -= velZ;
     });
     player.position.x += velX;
     player.position.y += velY;
@@ -222,6 +218,7 @@ function mainAnimationLoop() {
 
     // but then adjust camera back toward center of tube by a little bit
     camera.position.lerp(new THREE.Vector3(0, 0, camera.position.z), 0.1);
+    camera.position.z = CAMERA_DISTANCE_FROM_PLAYER + player.position.z;
 
     renderer.render(scene, camera);
     animate();
