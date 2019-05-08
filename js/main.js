@@ -174,6 +174,20 @@ function mainAnimationLoop() {
     player.position.x += velX;
     player.position.y += velY;
 
+    // force player to stay within bounds of cylinder
+    let playerXY = player.position.clone().setZ(0);
+    playerXY.setLength(Math.min(CYLINDER_RADIUS - PLAYER_RADIUS, playerXY.length()));
+    player.position.x = playerXY.x;
+    player.position.y = playerXY.y;
+
+    // reposition camera based on player
+    playerXY = player.position.clone().setZ(0);
+    const cameraXY = camera.position.clone().setZ(0);
+    const disp = new THREE.Vector3().subVectors(playerXY, cameraXY);
+    const desiredSpeed = disp.length() ** 2;
+    disp.setLength(desiredSpeed);
+    camera.position.add(disp);
+
     renderer.render(scene, camera);
     animate();
     SingletonKaleidoscopeTexture.needsUpdate = true;
