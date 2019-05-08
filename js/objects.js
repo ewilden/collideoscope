@@ -1,7 +1,7 @@
 const CYLINDER_RADIUS = 1;
 const CYLINDER_HEIGHT = 20;
 
-function NewPieCylinder() {
+function NewPieCylinder(startingZ) {
     const group = new THREE.Group();
     const sliceAngle = 2 * Math.PI / 12;
     for (let i = 0; i < 12; ++i) {
@@ -44,6 +44,7 @@ function NewPieCylinder() {
         lineCylinder.position.y = 0.99 * CYLINDER_RADIUS * Math.sin(theta);
         group.add(lineCylinder);
     }
+    group.position.z += startingZ;
     return group;
 }
 
@@ -129,23 +130,23 @@ const EnclosingKaleidoscopeMaterial = () => {
     return mat;
 }
 
-
 const TOTAL_NUM_SLICES = 12;
 const SLICE_ANGLE = 2 * Math.PI / TOTAL_NUM_SLICES;
 const REFLECTION_MATRIX = new THREE.Matrix4().makeRotationY(-SLICE_ANGLE / 2)
     .premultiply(new THREE.Matrix4().makeScale(-1, 1, 1))
     .premultiply(new THREE.Matrix4().makeRotationY(SLICE_ANGLE / 2));
+const BARRIER_RADIUS = CYLINDER_RADIUS;
+
+const PieBarrierGeometry = new THREE.CylinderGeometry(BARRIER_RADIUS, BARRIER_RADIUS, 1, 32, 1, false, 0, SLICE_ANGLE);
 
 function NewPieBarrier(
     numSlices, // how many 1/6-th slices are in the barrier
     gapPosition, // the angle (in radians) that the centerline of the gap in the barrier should be at
 ) {
-    const barrierRadius = CYLINDER_RADIUS;
     const slices = [];
-    const sliceAngle = 2 * Math.PI / TOTAL_NUM_SLICES;
 
     for (let i = 0; i < numSlices; ++i) {
-        const geometry = new THREE.CylinderGeometry(barrierRadius, barrierRadius, 1, 32, 1, false, 0, sliceAngle);
+        const geometry = PieBarrierGeometry;
         const material = KaleidoscopeMaterial();
         const cylinder = new THREE.Mesh(geometry, material);
 
@@ -155,7 +156,7 @@ function NewPieBarrier(
         }
 
         cylinder.rotation.x += Math.PI / 2;
-        cylinder.rotation.y += sliceAngle * i;
+        cylinder.rotation.y += SLICE_ANGLE * i;
         slices.push(cylinder);
     }
     const group = new THREE.Group();
@@ -171,7 +172,7 @@ let prevRotationAngle = -1;
 
 function NewRandomPieBarrier(startingZ = 0) {
     const minPossibleSlices = 2;
-    const maxPossibleSlices = 11;
+    const maxPossibleSlices = 10;
     let numSlices;
     do {
         numSlices = Math.floor(Math.random() * (maxPossibleSlices - minPossibleSlices + 1)) + minPossibleSlices;

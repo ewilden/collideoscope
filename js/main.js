@@ -7,37 +7,22 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 // set up objects in scene
-const sceneObjects = [];
-sceneObjects.push(NewPieCylinder());
+const enclosingCylinders = [
+    NewPieCylinder(0),
+    NewPieCylinder(-CYLINDER_HEIGHT),
+];
 
 const barriers = [];
 
-// const barrier1 = NewBarrier(1 / 2, 0);
-// const barrier1 = NewPieBarrier(12, 0);
-const barrier1 = NewRandomPieBarrier();
-barrier1.position.z = 4;
-barriers.push(barrier1);
+const NUM_STARTING_BARRIERS = 10;
+const BARRIER_STARTING_Z = 4;
+const BARRIER_Z_INCREMENT = 4;
+for (let i = 0; i < NUM_STARTING_BARRIERS; ++i) {
+    barriers.push(NewRandomPieBarrier(BARRIER_STARTING_Z - i * BARRIER_Z_INCREMENT));
+}
 
-// const barrier2 = NewBarrier(1 / 3, Math.PI / 2);
-// const barrier2 = NewPieBarrier(4, Math.PI / 2);
-const barrier2 = NewRandomPieBarrier();
-barrier2.position.z = 0;
-barriers.push(barrier2);
-
-// const barrier3 = NewBarrier(1 / 6, Math.PI / 8);
-// const barrier3 = NewPieBarrier(5, Math.PI / 8);
-const barrier3 = NewRandomPieBarrier();
-barrier3.position.z = -4;
-barriers.push(barrier3);
-
-const barrier4 = NewRandomPieBarrier();
-barrier4.position.z = -8;
-barriers.push(barrier4);
-
-
-barriers.forEach(b => sceneObjects.push(b));
-
-sceneObjects.forEach(obj => scene.add(obj));
+enclosingCylinders.forEach(obj => scene.add(obj));
+barriers.forEach(obj => scene.add(obj));
 
 const player = NewPlayer();
 player.position.z = camera.position.z - 1;
@@ -137,6 +122,7 @@ document.addEventListener('keyup', (event) => {
 });
 
 let zDisplacement = 0;
+let prevZDisplacement = 0;
 
 // animate/render loop
 function mainAnimationLoop() {
@@ -177,7 +163,11 @@ function mainAnimationLoop() {
     // rather than moving the camera into the scene, 
     // the scene moves itself toward the camera,
     // and rotates around the camera viewing axis.
-    sceneObjects.forEach(obj => {
+    enclosingCylinders.forEach(obj => {
+        obj.rotation.z += rotZ;
+        obj.position.z += velZ;
+    });
+    barriers.forEach(obj => {
         obj.rotation.z += rotZ;
         obj.position.z += velZ;
     });
@@ -185,6 +175,32 @@ function mainAnimationLoop() {
     player.position.y += velY;
 
     zDisplacement += velZ;
+
+    if (zDisplacement >= BARRIER_STARTING_Z + BARRIER_Z_INCREMENT && (zDisplacement % BARRIER_Z_INCREMENT < 0.2) && (prevZDisplacement % BARRIER_Z_INCREMENT > BARRIER_Z_INCREMENT - 0.8)) {
+        if (barriers[0]) {
+            barriers[0].children.forEach(child => {
+                child.material.dispose();
+            });
+            scene.remove(barriers[0]);
+            barriers.shift();
+        }
+        const newBarrier = NewRandomPieBarrier(barriers[barriers.length - 1].position.z - BARRIER_Z_INCREMENT);
+        barriers.push(newBarrier);
+        scene.add(newBarrier);
+    }
+    if (zDisplacement >= CYLINDER_HEIGHT && (zDisplacement % CYLINDER_HEIGHT < 1) && (prevZDisplacement % CYLINDER_HEIGHT > CYLINDER_HEIGHT - 1)) {
+        if (enclosingCylinders[0]) {
+            enclosingCylinders[0].children.forEach(child => {
+                child.material.dispose();
+                child.geometry.dispose();
+            });
+            scene.remove(enclosingCylinders[0]);
+            enclosingCylinders.shift();
+        }
+        const newCylinder = NewPieCylinder(enclosingCylinders[enclosingCylinders.length - 1].position.z - CYLINDER_HEIGHT);
+        enclosingCylinders.push(newCylinder);
+        scene.add(newCylinder);
+    }
 
     // force player to stay within bounds of cylinder
     let playerXY = player.position.clone().setZ(0);
@@ -206,5 +222,6 @@ function mainAnimationLoop() {
     renderer.render(scene, camera);
     animate();
     SingletonKaleidoscopeTexture.needsUpdate = true;
+    prevZDisplacement = zDisplacement;
 }
 mainAnimationLoop();
