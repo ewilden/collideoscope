@@ -1,7 +1,7 @@
 const CYLINDER_RADIUS = 1;
 const CYLINDER_HEIGHT = 20;
 
-function NewPieCylinder(startingZ) {
+function NewPieCylinder(startingZ, parity = false) {
     const group = new THREE.Group();
     const sliceAngle = 2 * Math.PI / 12;
     for (let i = 0; i < 12; ++i) {
@@ -44,6 +44,11 @@ function NewPieCylinder(startingZ) {
         lineCylinder.position.y = 0.99 * CYLINDER_RADIUS * Math.sin(theta);
         group.add(lineCylinder);
     }
+    if (parity) {
+        group.applyMatrix(new THREE.Matrix4().makeScale(1, 1, -1));
+    }
+
+
     group.position.z += startingZ;
     return group;
 }

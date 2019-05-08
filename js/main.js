@@ -6,10 +6,13 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+let CYLINDER_PARITY = false;
+const NUM_STARTING_CYLINDERS = 2;
+
 // set up objects in scene
 const enclosingCylinders = [
     NewPieCylinder(0),
-    NewPieCylinder(-CYLINDER_HEIGHT),
+    NewPieCylinder(-CYLINDER_HEIGHT, true),
 ];
 
 const barriers = [];
@@ -197,7 +200,8 @@ function mainAnimationLoop() {
             scene.remove(enclosingCylinders[0]);
             enclosingCylinders.shift();
         }
-        const newCylinder = NewPieCylinder(enclosingCylinders[enclosingCylinders.length - 1].position.z - CYLINDER_HEIGHT);
+        const newCylinder = NewPieCylinder(enclosingCylinders[enclosingCylinders.length - 1].position.z - CYLINDER_HEIGHT, CYLINDER_PARITY);
+        CYLINDER_PARITY = !CYLINDER_PARITY;
         enclosingCylinders.push(newCylinder);
         scene.add(newCylinder);
     }
