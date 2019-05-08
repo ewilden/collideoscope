@@ -11,6 +11,8 @@ const ctx = canvas.getContext('2d');
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+const NUM_SHAPES = 150;
+
 //********************************* Points ***********************************//
 function Point(x, y, dir) {
     this.loc = new THREE.Vector2(x, y);
@@ -36,6 +38,19 @@ Point.prototype.midpointTo = function (otherPoint) {
     return new Point(midX, midY);
 }
 
+Point.prototype.offCanvas = function () {
+    return this.loc.x <= 0 || this.loc.y <= 0 || 
+	this.loc.x >= canvas.width-1 || 
+	this.loc.y >= canvas.width-1;
+}
+
+// Point.prototype.wrapPosition = function() {
+//     if (this.loc.x <= 0) this.loc.x += canvas.width;
+//     else if (this.loc.x >= canvas.width) this.loc.x -= canvas.width;
+//     if (this.loc.y <= 0) this.loc.y += canvas.height;
+//     else if (this.loc.y >= canvas.width) this.loc.y -= canvas.width;
+// }
+
 /******************************** Triangles ***********************************/
 function Triangle(p1, p2, p3, color, dirVec, density) {
     this.p1 = p1;
@@ -46,13 +61,14 @@ function Triangle(p1, p2, p3, color, dirVec, density) {
 }
 
 Triangle.prototype.draw = function () {
+    ctx.fillStyle = this.color;
+    ctx.strokeStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
     ctx.lineTo(this.p2.loc.x, this.p2.loc.y);
     ctx.lineTo(this.p3.loc.x, this.p3.loc.y);
     ctx.closePath();
     ctx.stroke();
-    ctx.fillStyle = this.color;
     ctx.fill();
 }
 
@@ -60,6 +76,12 @@ Triangle.prototype.step = function () {
     this.p1.step(this.dir);
     this.p2.step(this.dir);
     this.p3.step(this.dir);
+}
+
+Triangle.prototype.handleBorder = function() {
+    if (this.p1.offCanvas() && this.p2.offCanvas() && this.p3.offCanvas()) {
+	this.dir.negate();
+    }
 }
 
 //******************************* Bezier shapes ******************************//
@@ -72,14 +94,15 @@ function BezierShape(p1, p2, color, dirVec, density) {
     this.dir = dirVec.multiplyScalar(density);
 
     var mid = p1.midpointTo(p2);
-    this.ctrl1 = mid.addNoise(50, 400);
-    this.ctrl2 = mid.addNoise(50, 400);
-    this.ctrl3 = mid.addNoise(50, 400);
-    this.ctrl4 = mid.addNoise(50, 400);
+    this.ctrl1 = mid.addNoise(100, 300);
+    this.ctrl2 = mid.addNoise(100, 300);
+    this.ctrl3 = mid.addNoise(100, 300);
+    this.ctrl4 = mid.addNoise(100, 300);
 }
 
 BezierShape.prototype.draw = function () {
     ctx.fillStyle = this.color;
+    ctx.strokeStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
     ctx.bezierCurveTo(this.ctrl1.loc.x, this.ctrl1.loc.y,
@@ -100,6 +123,11 @@ BezierShape.prototype.step = function () {
     this.ctrl4.step(this.dir);
 }
 
+BezierShape.prototype.handleBorder = function() {
+    if (this.p1.offCanvas() && this.p2.offCanvas()) 
+	this.dir.negate();
+}
+
 /*****************************************************************************/
 
 // https://stackoverflow.com/questions/1484506/random-color-generator
@@ -118,13 +146,13 @@ function getRandomPoint() {
     return new Point(x, y);
 }
 
-function getRandomPointNear(p, maxDist) {
-    var x = Math.random() * maxDist;
+function getRandomPointNear(p, minDist, maxDist) {
+    var x = Math.random() * (maxDist-minDist);
     if (Math.random() < .5) x *= -1;
-    x += p.loc.x;
-    var y = Math.random() * maxDist;
+    x += p.loc.x + minDist;
+    var y = Math.random() * (maxDist-minDist);
     if (Math.random() < .5) y *= -1;
-    y += p.loc.y;
+    y += p.loc.y + minDist;
     return new Point(x, y);
 }
 
@@ -138,8 +166,8 @@ function getRandomDir() {
 
 function randomTriangle() {
     var p1 = getRandomPoint();
-    var p2 = getRandomPointNear(p1, 300);
-    var p3 = getRandomPointNear(p1, 300);
+    var p2 = getRandomPointNear(p1, 100, 200);
+    var p3 = getRandomPointNear(p1, 100, 200);
     var color = getRandomColor();
     var dir = getRandomDir();
     var density = Math.random() * 5;
@@ -148,7 +176,7 @@ function randomTriangle() {
 
 function randomBezierShape() {
     var p1 = getRandomPoint();
-    var p2 = getRandomPointNear(p1, 300);
+    var p2 = getRandomPointNear(p1, 100, 200);
     var color = getRandomColor();
     var dir = getRandomDir();
     var density = Math.random() * 5;
@@ -161,13 +189,14 @@ function Simulation(n) {
         if (i % 4 == 0) {
             this.shapes.push(randomTriangle());
         } else {
-            this.shapes.push(randomBezierShape());
+	    this.shapes.push(randomBezierShape());
         }
     }
 }
 
 Simulation.prototype.drawShapes = function () {
     for (var i = 0; i < this.shapes.length; i++) {
+	this.shapes[i].handleBorder();
         this.shapes[i].draw();
     }
 }
@@ -196,9 +225,9 @@ if (IS_KALEIDOSCOPE_SIM) {
     }
 }
 
-sim = new Simulation(40);
+sim = new Simulation(NUM_SHAPES);
 animate();
 
 canvas.addEventListener('click', function () {
-    sim = new Simulation(40);
+    sim = new Simulation(NUM_SHAPES);
 }, false);
