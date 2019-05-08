@@ -38,7 +38,6 @@ function NewEnclosingCylinder() {
         lineCylinder.position.y = 0.99 * CYLINDER_RADIUS * Math.sin(theta);
         group.add(lineCylinder);
     }
-
     return group;
 }
 
@@ -59,33 +58,24 @@ function NewBarrier(
     return group;
 }
 
-const OddTexture = () => {
+const KaleidoscopeTexture = () => {
     const texture = new THREE.CanvasTexture(
         textureCanvas,
         THREE.UVMapping,
     );
-    texture.wrapS = THREE.RepeatWrapping;
-    return texture;
-}
-const EvenTexture = () => {
-    const texture = OddTexture();
-    texture.repeat.x = -1;
     return texture;
 }
 
-const ODD_TEST_MAT = () => new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.5, map: OddTexture() });
-const EVEN_TEST_MAT = () => {
-    return new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.5, map: EvenTexture() });
-};
+const KaleidoscopeMaterial = () => {
+    const mat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.5, map: KaleidoscopeTexture() });
+    return mat;
+}
 
 const TOTAL_NUM_SLICES = 12;
-const FLIPMATRIX = new THREE.Matrix4();
-FLIPMATRIX.set(
-    -1, 0, 0, 0,
-    0, -1, 0, 0,
-    0, 0, -1, 0,
-    0, 0, 0, 1,
-);
+const SLICE_ANGLE = 2 * Math.PI / TOTAL_NUM_SLICES;
+const REFLECTION_MATRIX = new THREE.Matrix4().makeRotationY(- SLICE_ANGLE / 2)
+    .premultiply(new THREE.Matrix4().makeScale(1, 1, -1))
+    .premultiply(new THREE.Matrix4().makeRotationY(SLICE_ANGLE / 2));
 
 function NewPieBarrier(
     numSlices, // how many 1/6-th slices are in the barrier
@@ -94,12 +84,17 @@ function NewPieBarrier(
     const barrierRadius = CYLINDER_RADIUS * 0.99;
     const slices = [];
     const sliceAngle = 2 * Math.PI / TOTAL_NUM_SLICES;
+
     for (let i = 0; i < numSlices; ++i) {
         const geometry = new THREE.CylinderGeometry(barrierRadius, barrierRadius, 1, 32, 1, false, 0, sliceAngle);
-        const material = i % 2 == 0 ? ODD_TEST_MAT() : EVEN_TEST_MAT();
-        // const material = EVEN_TEST_MAT();
-        material.side = THREE.DoubleSide;
+        const material = KaleidoscopeMaterial();
         const cylinder = new THREE.Mesh(geometry, material);
+
+        // this is where the kaleidoscope effect comes in!
+        if (i % 2 == 0) {
+            cylinder.applyMatrix(REFLECTION_MATRIX);
+        }
+
         cylinder.rotation.x += Math.PI / 2;
         cylinder.rotation.y += sliceAngle * i;
         slices.push(cylinder);

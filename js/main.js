@@ -32,10 +32,10 @@ player.position.z = 4;
 scene.add(player);
 
 // set up lights
-const pointLight = new THREE.PointLight(0xff5588, 1, 100);
+const pointLight = new THREE.PointLight(0xffffff, 1, 100);
 scene.add(pointLight);
 pointLight.position.set(4, 4, 4);
-const centerLight = new THREE.PointLight(0x1111ff, 1, 100);
+const centerLight = new THREE.PointLight(0xffffff, 1, 100);
 scene.add(centerLight);
 centerLight.position.set(0, 0, -5);
 const ambient = new THREE.AmbientLight(0xffffff);
