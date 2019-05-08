@@ -165,12 +165,26 @@ function NewPieBarrier(
     return group;
 }
 
-function NewRandomPieBarrier() {
+// make things more random feeling (prevent repeats)
+let prevSlices = -1;
+let prevRotationAngle = -1;
+
+function NewRandomPieBarrier(startingZ = 0) {
     const minPossibleSlices = 2;
     const maxPossibleSlices = 11;
-    const numSlices = Math.floor(Math.random() * (maxPossibleSlices - minPossibleSlices + 1));
-    const rotationAngle = Math.floor(Math.random() * 6) * Math.PI * 2 / 6;
-    return NewPieBarrier(numSlices, rotationAngle);
+    let numSlices;
+    do {
+        numSlices = Math.floor(Math.random() * (maxPossibleSlices - minPossibleSlices + 1)) + minPossibleSlices;
+    } while (prevSlices === numSlices);
+    prevSlices = numSlices;
+    let rotationAngle;
+    do {
+        rotationAngle = Math.floor(Math.random() * 6) * Math.PI * 2 / 6;
+    } while (prevRotationAngle === rotationAngle);
+    prevRotationAngle = rotationAngle;
+    const barrier = NewPieBarrier(numSlices, rotationAngle);
+    barrier.position.z += startingZ;
+    return barrier;
 }
 
 const PLAYER_RADIUS = 0.2;

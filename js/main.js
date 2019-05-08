@@ -30,6 +30,11 @@ const barrier3 = NewRandomPieBarrier();
 barrier3.position.z = -4;
 barriers.push(barrier3);
 
+const barrier4 = NewRandomPieBarrier();
+barrier4.position.z = -8;
+barriers.push(barrier4);
+
+
 barriers.forEach(b => sceneObjects.push(b));
 
 sceneObjects.forEach(obj => scene.add(obj));
