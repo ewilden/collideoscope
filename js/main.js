@@ -1,6 +1,6 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 5;
+camera.position.z = 8;
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -13,18 +13,21 @@ sceneObjects.push(NewPieCylinder());
 const barriers = [];
 
 // const barrier1 = NewBarrier(1 / 2, 0);
-const barrier1 = NewPieBarrier(12, 0);
-barrier1.position.z = 2;
+// const barrier1 = NewPieBarrier(12, 0);
+const barrier1 = NewRandomPieBarrier();
+barrier1.position.z = 4;
 barriers.push(barrier1);
 
 // const barrier2 = NewBarrier(1 / 3, Math.PI / 2);
-const barrier2 = NewPieBarrier(4, Math.PI / 2);
+// const barrier2 = NewPieBarrier(4, Math.PI / 2);
+const barrier2 = NewRandomPieBarrier();
 barrier2.position.z = 0;
 barriers.push(barrier2);
 
 // const barrier3 = NewBarrier(1 / 6, Math.PI / 8);
-const barrier3 = NewPieBarrier(5, Math.PI / 8);
-barrier3.position.z = -2;
+// const barrier3 = NewPieBarrier(5, Math.PI / 8);
+const barrier3 = NewRandomPieBarrier();
+barrier3.position.z = -4;
 barriers.push(barrier3);
 
 barriers.forEach(b => sceneObjects.push(b));
@@ -32,14 +35,14 @@ barriers.forEach(b => sceneObjects.push(b));
 sceneObjects.forEach(obj => scene.add(obj));
 
 const player = NewPlayer();
-player.position.z = 4;
+player.position.z = camera.position.z - 1;
 scene.add(player);
 
 // set up lights
 const lights = [];
 
 const cameraLight = new THREE.PointLight(0xffffff, 1, 100, 0);
-cameraLight.position.set(0, 0, 6);
+cameraLight.position.set(0, 0, camera.position.z + 1);
 lights.push(cameraLight);
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
@@ -128,6 +131,8 @@ document.addEventListener('keyup', (event) => {
     })
 });
 
+let zDisplacement = 0;
+
 // animate/render loop
 function mainAnimationLoop() {
     requestAnimationFrame(mainAnimationLoop);
@@ -173,6 +178,8 @@ function mainAnimationLoop() {
     });
     player.position.x += velX;
     player.position.y += velY;
+
+    zDisplacement += velZ;
 
     // force player to stay within bounds of cylinder
     let playerXY = player.position.clone().setZ(0);

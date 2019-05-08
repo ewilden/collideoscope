@@ -132,9 +132,9 @@ const EnclosingKaleidoscopeMaterial = () => {
 
 const TOTAL_NUM_SLICES = 12;
 const SLICE_ANGLE = 2 * Math.PI / TOTAL_NUM_SLICES;
-const REFLECTION_MATRIX = new THREE.Matrix4().makeRotationY(- SLICE_ANGLE / 2)
-    .multiply(new THREE.Matrix4().makeScale(1, 1, -1))
-    .multiply(new THREE.Matrix4().makeRotationY(SLICE_ANGLE / 2));
+const REFLECTION_MATRIX = new THREE.Matrix4().makeRotationY(-SLICE_ANGLE / 2)
+    .premultiply(new THREE.Matrix4().makeScale(-1, 1, 1))
+    .premultiply(new THREE.Matrix4().makeRotationY(SLICE_ANGLE / 2));
 
 function NewPieBarrier(
     numSlices, // how many 1/6-th slices are in the barrier
@@ -163,6 +163,14 @@ function NewPieBarrier(
     const gapFraction = 1 - numSlices / TOTAL_NUM_SLICES;
     group.rotation.z += gapFraction * Math.PI + Math.PI / 2 + gapPosition;
     return group;
+}
+
+function NewRandomPieBarrier() {
+    const minPossibleSlices = 2;
+    const maxPossibleSlices = 11;
+    const numSlices = Math.floor(Math.random() * (maxPossibleSlices - minPossibleSlices + 1));
+    const rotationAngle = Math.floor(Math.random() * 6) * Math.PI * 2 / 6;
+    return NewPieBarrier(numSlices, rotationAngle);
 }
 
 const PLAYER_RADIUS = 0.2;
