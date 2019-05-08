@@ -8,7 +8,7 @@ document.body.appendChild(renderer.domElement);
 
 // set up objects in scene
 const sceneObjects = [];
-sceneObjects.push(NewEnclosingCylinder());
+sceneObjects.push(NewPieCylinder());
 
 const barriers = [];
 
@@ -36,14 +36,23 @@ player.position.z = 4;
 scene.add(player);
 
 // set up lights
-const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-scene.add(pointLight);
-pointLight.position.set(4, 4, 4);
-const centerLight = new THREE.PointLight(0xffffff, 1, 100);
-scene.add(centerLight);
-centerLight.position.set(0, 0, -5);
-const ambient = new THREE.AmbientLight(0xffffff);
-scene.add(ambient);
+const lights = [];
+
+const cameraLight = new THREE.PointLight(0xffffff, 1, 100, 0);
+cameraLight.position.set(0, 0, 6);
+lights.push(cameraLight);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+lights.push(ambientLight);
+
+// const directionalLight = new THREE.DirectionalLight(0xffffff, 100);
+// directionalLight.position.set(0, 0, -6);
+// lights.push(directionalLight);
+// const centerLight = new THREE.PointLight(0xffffff, 0.3, 100);
+// centerLight.position.set(0, 0, 0);
+// lights.push(centerLight);
+
+lights.forEach(l => scene.add(l));
 
 // addKeyAction takes a {key, keyCode}, onDown function, and onUp function, 
 // and together with the later addEventListener calls, makes it so that
@@ -167,6 +176,6 @@ function mainAnimationLoop() {
 
     renderer.render(scene, camera);
     animate();
-    barriers.forEach(b => b.children.forEach(child => child.material.map.needsUpdate = true));
+    SingletonKaleidoscopeTexture.needsUpdate = true;
 }
 mainAnimationLoop();

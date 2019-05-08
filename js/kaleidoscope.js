@@ -189,6 +189,8 @@ if (IS_KALEIDOSCOPE_SIM) {
 } else {
     animate = function () {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#111";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         sim.drawShapes();
         sim.updatePositions();
     }
