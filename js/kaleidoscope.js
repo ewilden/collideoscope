@@ -38,6 +38,19 @@ Point.prototype.midpointTo = function (otherPoint) {
     return new Point(midX, midY);
 }
 
+Point.prototype.offCanvas = function () {
+    return this.loc.x <= 0 || this.loc.y <= 0 || 
+	this.loc.x >= canvas.width-1 || 
+	this.loc.y >= canvas.width-1;
+}
+
+// Point.prototype.wrapPosition = function() {
+//     if (this.loc.x <= 0) this.loc.x += canvas.width;
+//     else if (this.loc.x >= canvas.width) this.loc.x -= canvas.width;
+//     if (this.loc.y <= 0) this.loc.y += canvas.height;
+//     else if (this.loc.y >= canvas.width) this.loc.y -= canvas.width;
+// }
+
 /******************************** Triangles ***********************************/
 function Triangle(p1, p2, p3, color, dirVec, density) {
     this.p1 = p1;
@@ -62,6 +75,12 @@ Triangle.prototype.step = function () {
     this.p1.step(this.dir);
     this.p2.step(this.dir);
     this.p3.step(this.dir);
+}
+
+Triangle.prototype.handleBorder = function() {
+    if (this.p1.offCanvas() && this.p2.offCanvas() && this.p3.offCanvas()) {
+	this.dir.negate();
+    }
 }
 
 //******************************* Bezier shapes ******************************//
@@ -100,6 +119,11 @@ BezierShape.prototype.step = function () {
     this.ctrl2.step(this.dir);
     this.ctrl3.step(this.dir);
     this.ctrl4.step(this.dir);
+}
+
+BezierShape.prototype.handleBorder = function() {
+    if (this.p1.offCanvas() && this.p2.offCanvas()) 
+	this.dir.negate();
 }
 
 /*****************************************************************************/
@@ -163,13 +187,14 @@ function Simulation(n) {
         if (i % 4 == 0) {
             this.shapes.push(randomTriangle());
         } else {
-            this.shapes.push(randomBezierShape());
+	    this.shapes.push(randomBezierShape());
         }
     }
 }
 
 Simulation.prototype.drawShapes = function () {
     for (var i = 0; i < this.shapes.length; i++) {
+	this.shapes[i].handleBorder();
         this.shapes[i].draw();
     }
 }
