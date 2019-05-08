@@ -1,4 +1,12 @@
-const canvas = document.getElementById('canvas');
+let canvas;
+if (IS_KALEIDOSCOPE_SIM) {
+    canvas = document.getElementById('canvas');
+} else {
+    canvas = document.createElement('canvas');
+}
+canvas.width = 1024;
+canvas.height = 1024;
+const textureCanvas = canvas;
 const ctx = canvas.getContext('2d');
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -8,13 +16,13 @@ function Point(x, y, dir) {
     this.loc = new THREE.Vector2(x, y);
 }
 
-Point.prototype.step = function(dirVec) {
+Point.prototype.step = function (dirVec) {
     this.loc.add(dirVec);
 }
 
 // Add random ∆s, bounded by min and max, to both x and y coordinates 
 // of the point. Return as a new point.
-Point.prototype.addNoise = function(min, max) {
+Point.prototype.addNoise = function (min, max) {
     var xNoise = min + Math.random() * (max - min);
     var yNoise = min + Math.random() * (max - min);
     if (Math.random() < 0.5) xNoise *= -1;
@@ -22,7 +30,7 @@ Point.prototype.addNoise = function(min, max) {
     return new Point(this.loc.x + xNoise, this.loc.y + yNoise);
 }
 
-Point.prototype.midpointTo = function(otherPoint) {
+Point.prototype.midpointTo = function (otherPoint) {
     var midX = (this.loc.x + otherPoint.loc.x) / 2;
     var midY = (this.loc.y + otherPoint.loc.y) / 2;
     return new Point(midX, midY);
@@ -37,7 +45,7 @@ function Triangle(p1, p2, p3, color, dirVec, density) {
     this.dir = dirVec.multiplyScalar(density);
 }
 
-Triangle.prototype.draw = function() {
+Triangle.prototype.draw = function () {
     ctx.beginPath();
     ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
     ctx.lineTo(this.p2.loc.x, this.p2.loc.y);
@@ -48,7 +56,7 @@ Triangle.prototype.draw = function() {
     ctx.fill();
 }
 
-Triangle.prototype.step = function() {
+Triangle.prototype.step = function () {
     this.p1.step(this.dir);
     this.p2.step(this.dir);
     this.p3.step(this.dir);
@@ -70,20 +78,20 @@ function BezierShape(p1, p2, color, dirVec, density) {
     this.ctrl4 = mid.addNoise(50, 400);
 }
 
-BezierShape.prototype.draw = function() {
+BezierShape.prototype.draw = function () {
     ctx.fillStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
-    ctx.bezierCurveTo(this.ctrl1.loc.x, this.ctrl1.loc.y, 
-	this.ctrl2.loc.x, this.ctrl2.loc.y, this.p2.loc.x, this.p2.loc.y);
-    ctx.bezierCurveTo(this.ctrl3.loc.x, this.ctrl3.y, 
-	this.ctrl4.loc.x, this.ctrl4.loc.y, this.p1.loc.x, this.p1.loc.y);
+    ctx.bezierCurveTo(this.ctrl1.loc.x, this.ctrl1.loc.y,
+        this.ctrl2.loc.x, this.ctrl2.loc.y, this.p2.loc.x, this.p2.loc.y);
+    ctx.bezierCurveTo(this.ctrl3.loc.x, this.ctrl3.y,
+        this.ctrl4.loc.x, this.ctrl4.loc.y, this.p1.loc.x, this.p1.loc.y);
     ctx.stroke();
     ctx.closePath();
     ctx.fill();
- }
+}
 
-BezierShape.prototype.step = function() {
+BezierShape.prototype.step = function () {
     this.p1.step(this.dir);
     this.p2.step(this.dir);
     this.ctrl1.step(this.dir);
@@ -99,7 +107,7 @@ function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
     for (var i = 0; i < 6; i++) {
-	color += letters[Math.floor(Math.random() * 16)];
+        color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
 }
@@ -150,27 +158,27 @@ function randomBezierShape() {
 function Simulation(n) {
     this.shapes = []
     for (var i = 0; i < n; i++) {
-	if (i % 4 == 0) {
-	    this.shapes.push(randomTriangle());
-	} else {
-	    this.shapes.push(randomBezierShape());
-	}
+        if (i % 4 == 0) {
+            this.shapes.push(randomTriangle());
+        } else {
+            this.shapes.push(randomBezierShape());
+        }
     }
 }
 
-Simulation.prototype.drawShapes = function() {
+Simulation.prototype.drawShapes = function () {
     for (var i = 0; i < this.shapes.length; i++) {
-	this.shapes[i].draw();
+        this.shapes[i].draw();
     }
 }
 
-Simulation.prototype.updatePositions = function() {
+Simulation.prototype.updatePositions = function () {
     for (var i = 0; i < this.shapes.length; i++) {
-	this.shapes[i].step();
+        this.shapes[i].step();
     }
 }
 
-let animate = function() {
+let animate = function () {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     sim.drawShapes();
     sim.updatePositions();
@@ -180,11 +188,6 @@ let animate = function() {
 sim = new Simulation(40);
 animate();
 
-canvas.addEventListener('click', function() { 
-   sim = new Simulation(40);
+canvas.addEventListener('click', function () {
+    sim = new Simulation(40);
 }, false);
-
-
-
-
-
