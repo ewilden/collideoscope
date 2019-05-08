@@ -4,14 +4,14 @@ if (IS_KALEIDOSCOPE_SIM) {
 } else {
     canvas = document.createElement('canvas');
 }
-canvas.width = 512;
-canvas.height = 512;
+canvas.width = 1024;
+canvas.height = 1024;
 const textureCanvas = canvas;
 const ctx = canvas.getContext('2d');
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-const NUM_SHAPES = 100;
+const NUM_SHAPES = 150;
 
 //********************************* Points ***********************************//
 function Point(x, y, dir) {
@@ -61,13 +61,14 @@ function Triangle(p1, p2, p3, color, dirVec, density) {
 }
 
 Triangle.prototype.draw = function () {
+    ctx.fillStyle = this.color;
+    ctx.strokeStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
     ctx.lineTo(this.p2.loc.x, this.p2.loc.y);
     ctx.lineTo(this.p3.loc.x, this.p3.loc.y);
     ctx.closePath();
     ctx.stroke();
-    ctx.fillStyle = this.color;
     ctx.fill();
 }
 
@@ -101,6 +102,7 @@ function BezierShape(p1, p2, color, dirVec, density) {
 
 BezierShape.prototype.draw = function () {
     ctx.fillStyle = this.color;
+    ctx.strokeStyle = this.color;
     ctx.beginPath();
     ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
     ctx.bezierCurveTo(this.ctrl1.loc.x, this.ctrl1.loc.y,
@@ -164,8 +166,8 @@ function getRandomDir() {
 
 function randomTriangle() {
     var p1 = getRandomPoint();
-    var p2 = getRandomPointNear(p1, 50, 100);
-    var p3 = getRandomPointNear(p1, 50, 100);
+    var p2 = getRandomPointNear(p1, 100, 200);
+    var p3 = getRandomPointNear(p1, 100, 200);
     var color = getRandomColor();
     var dir = getRandomDir();
     var density = Math.random() * 5;
@@ -174,7 +176,7 @@ function randomTriangle() {
 
 function randomBezierShape() {
     var p1 = getRandomPoint();
-    var p2 = getRandomPointNear(p1, 50, 100);
+    var p2 = getRandomPointNear(p1, 100, 200);
     var color = getRandomColor();
     var dir = getRandomDir();
     var density = Math.random() * 5;
