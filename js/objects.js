@@ -165,8 +165,10 @@ function NewPieBarrier(
     return group;
 }
 
+const PLAYER_RADIUS = 0.2;
+
 function NewPlayer() {
-    const geometry = new THREE.SphereGeometry(0.2, 12, 12);
+    const geometry = new THREE.SphereGeometry(PLAYER_RADIUS, 12, 12);
     const material = new THREE.MeshStandardMaterial({ color: 0xFF0000, metalness: 0.33 });
     const player = new THREE.Mesh(geometry, material);
     return player;
