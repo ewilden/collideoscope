@@ -174,6 +174,14 @@ function mainAnimationLoop() {
     player.position.x += velX;
     player.position.y += velY;
 
+    // reposition camera based on player
+    const playerXY = player.position.clone().setZ(0);
+    const cameraXY = camera.position.clone().setZ(0);
+    const disp = new THREE.Vector3().subVectors(playerXY, cameraXY);
+    const desiredSpeed = Math.min(disp.length() / 10, 0.05);
+    disp.setLength(desiredSpeed);
+    camera.position.add(disp);
+
     renderer.render(scene, camera);
     animate();
     SingletonKaleidoscopeTexture.needsUpdate = true;
