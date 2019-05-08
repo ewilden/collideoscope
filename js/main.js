@@ -188,6 +188,9 @@ function mainAnimationLoop() {
     disp.setLength(desiredSpeed);
     camera.position.add(disp);
 
+    // but then adjust camera back toward center of tube by a little bit
+    camera.position.lerp(new THREE.Vector3(0, 0, camera.position.z), 0.1);
+
     renderer.render(scene, camera);
     animate();
     SingletonKaleidoscopeTexture.needsUpdate = true;
