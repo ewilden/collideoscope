@@ -8,7 +8,7 @@ canvas.width = 1024;
 canvas.height = 1024;
 const textureCanvas = canvas;
 const ctx = canvas.getContext('2d');
-ctx.fillStyle = "black";
+ctx.fillStyle = "#111";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 const NUM_SHAPES = 150;
@@ -56,13 +56,17 @@ function Triangle(p1, p2, p3, color, dirVec, density) {
     this.p1 = p1;
     this.p2 = p2;
     this.p3 = p3;
+
     this.color = color;
+    this.transitionStep = 300;
+    this.totalSteps = 300;
+
     this.dir = dirVec.multiplyScalar(density);
 }
 
 Triangle.prototype.draw = function () {
-    ctx.fillStyle = this.color;
-    ctx.strokeStyle = this.color;
+    ctx.fillStyle = '#' + this.color.getHexString();
+    ctx.strokeStyle = '#' + this.color.getHexString();
     ctx.beginPath();
     ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
     ctx.lineTo(this.p2.loc.x, this.p2.loc.y);
@@ -84,14 +88,33 @@ Triangle.prototype.handleBorder = function() {
     }
 }
 
+Triangle.prototype.evolveColor = function() {
+    if (this.transitionStep == this.totalSteps) {
+	this.targetColor = getRandomColor();
+	this.transitionStep = 0;
+	this.delta_r = (this.targetColor.r - this.color.r)/this.totalSteps;
+	this.delta_g = (this.targetColor.g - this.color.g)/this.totalSteps;
+	this.delta_b = (this.targetColor.b - this.color.b)/this.totalSteps;
+    } 
+
+    this.color.r += this.delta_r;
+    this.color.g += this.delta_g;
+    this.color.b += this.delta_b;
+    this.transitionStep += 1;
+}
+
+
 //******************************* Bezier shapes ******************************//
 // A new shape defined by two Bezier curves between two points, with randomly
 // generated control points.
 function BezierShape(p1, p2, color, dirVec, density) {
     this.p1 = p1;
     this.p2 = p2;
-    this.color = color;
     this.dir = dirVec.multiplyScalar(density);
+
+    this.color = color;
+    this.transitionStep = 300;
+    this.totalSteps = 300;
 
     var mid = p1.midpointTo(p2);
     this.ctrl1 = mid.addNoise(100, 300);
@@ -101,8 +124,8 @@ function BezierShape(p1, p2, color, dirVec, density) {
 }
 
 BezierShape.prototype.draw = function () {
-    ctx.fillStyle = this.color;
-    ctx.strokeStyle = this.color;
+    ctx.fillStyle = '#' + this.color.getHexString();
+    ctx.strokeStyle = '#' + this.color.getHexString();
     ctx.beginPath();
     ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
     ctx.bezierCurveTo(this.ctrl1.loc.x, this.ctrl1.loc.y,
@@ -128,16 +151,26 @@ BezierShape.prototype.handleBorder = function() {
 	this.dir.negate();
 }
 
+BezierShape.prototype.evolveColor = function() {
+    if (this.transitionStep == this.totalSteps) {
+	this.targetColor = getRandomColor();
+	this.transitionStep = 0;
+	this.delta_r = (this.targetColor.r - this.color.r)/this.totalSteps;
+	this.delta_g = (this.targetColor.g - this.color.g)/this.totalSteps;
+	this.delta_b = (this.targetColor.b - this.color.b)/this.totalSteps;
+    } 
+
+    this.color.r += this.delta_r;
+    this.color.g += this.delta_g;
+    this.color.b += this.delta_b;
+    this.transitionStep += 1;
+}
+
 /*****************************************************************************/
 
 // https://stackoverflow.com/questions/1484506/random-color-generator
 function getRandomColor() {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    return new THREE.Color(Math.random() * 0xFFFFFF);
 }
 
 function getRandomPoint() {
@@ -170,7 +203,7 @@ function randomTriangle() {
     var p3 = getRandomPointNear(p1, 100, 200);
     var color = getRandomColor();
     var dir = getRandomDir();
-    var density = Math.random() * 5;
+    var density = Math.random() * 10;
     return new Triangle(p1, p2, p3, color, dir, density);
 }
 
@@ -179,7 +212,7 @@ function randomBezierShape() {
     var p2 = getRandomPointNear(p1, 100, 200);
     var color = getRandomColor();
     var dir = getRandomDir();
-    var density = Math.random() * 5;
+    var density = Math.random() * 10;
     return new BezierShape(p1, p2, color, dir, density);
 }
 
@@ -197,6 +230,7 @@ function Simulation(n) {
 Simulation.prototype.drawShapes = function () {
     for (var i = 0; i < this.shapes.length; i++) {
 	this.shapes[i].handleBorder();
+	this.shapes[i].evolveColor();
         this.shapes[i].draw();
     }
 }
@@ -218,7 +252,7 @@ if (IS_KALEIDOSCOPE_SIM) {
 } else {
     animate = function () {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "#111";
+	ctx.fillStyle = "#111";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         sim.drawShapes();
         sim.updatePositions();
