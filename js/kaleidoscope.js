@@ -4,12 +4,14 @@ if (IS_KALEIDOSCOPE_SIM) {
 } else {
     canvas = document.createElement('canvas');
 }
-canvas.width = 1024;
-canvas.height = 1024;
+canvas.width = 512;
+canvas.height = 512;
 const textureCanvas = canvas;
 const ctx = canvas.getContext('2d');
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+const NUM_SHAPES = 100;
 
 //********************************* Points ***********************************//
 function Point(x, y, dir) {
@@ -72,10 +74,10 @@ function BezierShape(p1, p2, color, dirVec, density) {
     this.dir = dirVec.multiplyScalar(density);
 
     var mid = p1.midpointTo(p2);
-    this.ctrl1 = mid.addNoise(50, 400);
-    this.ctrl2 = mid.addNoise(50, 400);
-    this.ctrl3 = mid.addNoise(50, 400);
-    this.ctrl4 = mid.addNoise(50, 400);
+    this.ctrl1 = mid.addNoise(100, 300);
+    this.ctrl2 = mid.addNoise(100, 300);
+    this.ctrl3 = mid.addNoise(100, 300);
+    this.ctrl4 = mid.addNoise(100, 300);
 }
 
 BezierShape.prototype.draw = function () {
@@ -118,13 +120,13 @@ function getRandomPoint() {
     return new Point(x, y);
 }
 
-function getRandomPointNear(p, maxDist) {
-    var x = Math.random() * maxDist;
+function getRandomPointNear(p, minDist, maxDist) {
+    var x = Math.random() * (maxDist-minDist);
     if (Math.random() < .5) x *= -1;
-    x += p.loc.x;
-    var y = Math.random() * maxDist;
+    x += p.loc.x + minDist;
+    var y = Math.random() * (maxDist-minDist);
     if (Math.random() < .5) y *= -1;
-    y += p.loc.y;
+    y += p.loc.y + minDist;
     return new Point(x, y);
 }
 
@@ -138,8 +140,8 @@ function getRandomDir() {
 
 function randomTriangle() {
     var p1 = getRandomPoint();
-    var p2 = getRandomPointNear(p1, 300);
-    var p3 = getRandomPointNear(p1, 300);
+    var p2 = getRandomPointNear(p1, 50, 100);
+    var p3 = getRandomPointNear(p1, 50, 100);
     var color = getRandomColor();
     var dir = getRandomDir();
     var density = Math.random() * 5;
@@ -148,7 +150,7 @@ function randomTriangle() {
 
 function randomBezierShape() {
     var p1 = getRandomPoint();
-    var p2 = getRandomPointNear(p1, 300);
+    var p2 = getRandomPointNear(p1, 50, 100);
     var color = getRandomColor();
     var dir = getRandomDir();
     var density = Math.random() * 5;
@@ -196,9 +198,9 @@ if (IS_KALEIDOSCOPE_SIM) {
     }
 }
 
-sim = new Simulation(40);
+sim = new Simulation(NUM_SHAPES);
 animate();
 
 canvas.addEventListener('click', function () {
-    sim = new Simulation(40);
+    sim = new Simulation(NUM_SHAPES);
 }, false);
