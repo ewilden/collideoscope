@@ -10,20 +10,24 @@ document.body.appendChild(renderer.domElement);
 const sceneObjects = [];
 sceneObjects.push(NewEnclosingCylinder());
 
+const barriers = [];
+
 // const barrier1 = NewBarrier(1 / 2, 0);
 const barrier1 = NewPieBarrier(12, 0);
 barrier1.position.z = 2;
-sceneObjects.push(barrier1);
+barriers.push(barrier1);
 
 // const barrier2 = NewBarrier(1 / 3, Math.PI / 2);
 const barrier2 = NewPieBarrier(4, Math.PI / 2);
 barrier2.position.z = 0;
-sceneObjects.push(barrier2);
+barriers.push(barrier2);
 
 // const barrier3 = NewBarrier(1 / 6, Math.PI / 8);
 const barrier3 = NewPieBarrier(5, Math.PI / 8);
 barrier3.position.z = -2;
-sceneObjects.push(barrier3);
+barriers.push(barrier3);
+
+barriers.forEach(b => sceneObjects.push(b));
 
 sceneObjects.forEach(obj => scene.add(obj));
 
@@ -116,8 +120,8 @@ document.addEventListener('keyup', (event) => {
 });
 
 // animate/render loop
-function animate() {
-    requestAnimationFrame(animate);
+function mainAnimationLoop() {
+    requestAnimationFrame(mainAnimationLoop);
 
     // update rotation and depth velocity
     let velZ = 0;
@@ -158,9 +162,13 @@ function animate() {
         obj.rotation.z += rotZ;
         obj.position.z += velZ;
     });
+    // barriers.forEach(b => {
+    //     // b.children.forEach(child => child.material.map.needsUpdate = true);
+    //     // console.log(b);
+    // })
     player.position.x += velX;
     player.position.y += velY;
 
     renderer.render(scene, camera);
 }
-animate();
+mainAnimationLoop();

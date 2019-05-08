@@ -1,4 +1,9 @@
-const canvas = document.createElement('canvas');
+let canvas;
+if (IS_KALEIDOSCOPE_SIM) {
+    canvas = document.getElementById('canvas');
+} else {
+    canvas = document.createElement('canvas');
+}
 canvas.width = 1024;
 canvas.height = 1024;
 const textureCanvas = canvas;
@@ -6,40 +11,98 @@ const ctx = canvas.getContext('2d');
 ctx.fillStyle = "black";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-function Point(x, y) {
-    this.x = x;
-    this.y = y;
+//********************************* Points ***********************************//
+function Point(x, y, dir) {
+    this.loc = new THREE.Vector2(x, y);
 }
 
-Point.prototype.step = function (dx, dy) {
-    this.x += dx;
-    this.y += dy;
+Point.prototype.step = function (dirVec) {
+    this.loc.add(dirVec);
 }
 
-function Triangle(p1, p2, p3, color) {
+// Add random ∆s, bounded by min and max, to both x and y coordinates 
+// of the point. Return as a new point.
+Point.prototype.addNoise = function (min, max) {
+    var xNoise = min + Math.random() * (max - min);
+    var yNoise = min + Math.random() * (max - min);
+    if (Math.random() < 0.5) xNoise *= -1;
+    if (Math.random() < 0.5) yNoise *= -1;
+    return new Point(this.loc.x + xNoise, this.loc.y + yNoise);
+}
+
+Point.prototype.midpointTo = function (otherPoint) {
+    var midX = (this.loc.x + otherPoint.loc.x) / 2;
+    var midY = (this.loc.y + otherPoint.loc.y) / 2;
+    return new Point(midX, midY);
+}
+
+/******************************** Triangles ***********************************/
+function Triangle(p1, p2, p3, color, dirVec, density) {
     this.p1 = p1;
     this.p2 = p2;
     this.p3 = p3;
-    this.colorString = color;
+    this.color = color;
+    this.dir = dirVec.multiplyScalar(density);
 }
 
 Triangle.prototype.draw = function () {
     ctx.beginPath();
-    ctx.moveTo(this.p1.x, this.p1.y);
-    ctx.lineTo(this.p2.x, this.p2.y);
-    ctx.lineTo(this.p3.x, this.p3.y);
+    ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
+    ctx.lineTo(this.p2.loc.x, this.p2.loc.y);
+    ctx.lineTo(this.p3.loc.x, this.p3.loc.y);
     ctx.closePath();
     ctx.stroke();
-    ctx.fillStyle = this.colorString;
+    ctx.fillStyle = this.color;
     ctx.fill();
 }
 
 Triangle.prototype.step = function () {
-    this.p1.step(1, 1);
-    this.p2.step(1, 1);
-    this.p3.step(1, 1);
+    this.p1.step(this.dir);
+    this.p2.step(this.dir);
+    this.p3.step(this.dir);
 }
 
+//******************************* Bezier shapes ******************************//
+// A new shape defined by two Bezier curves between two points, with randomly
+// generated control points.
+function BezierShape(p1, p2, color, dirVec, density) {
+    this.p1 = p1;
+    this.p2 = p2;
+    this.color = color;
+    this.dir = dirVec.multiplyScalar(density);
+
+    var mid = p1.midpointTo(p2);
+    this.ctrl1 = mid.addNoise(50, 400);
+    this.ctrl2 = mid.addNoise(50, 400);
+    this.ctrl3 = mid.addNoise(50, 400);
+    this.ctrl4 = mid.addNoise(50, 400);
+}
+
+BezierShape.prototype.draw = function () {
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.moveTo(this.p1.loc.x, this.p1.loc.y);
+    ctx.bezierCurveTo(this.ctrl1.loc.x, this.ctrl1.loc.y,
+        this.ctrl2.loc.x, this.ctrl2.loc.y, this.p2.loc.x, this.p2.loc.y);
+    ctx.bezierCurveTo(this.ctrl3.loc.x, this.ctrl3.y,
+        this.ctrl4.loc.x, this.ctrl4.loc.y, this.p1.loc.x, this.p1.loc.y);
+    ctx.stroke();
+    ctx.closePath();
+    ctx.fill();
+}
+
+BezierShape.prototype.step = function () {
+    this.p1.step(this.dir);
+    this.p2.step(this.dir);
+    this.ctrl1.step(this.dir);
+    this.ctrl2.step(this.dir);
+    this.ctrl3.step(this.dir);
+    this.ctrl4.step(this.dir);
+}
+
+/*****************************************************************************/
+
+// https://stackoverflow.com/questions/1484506/random-color-generator
 function getRandomColor() {
     var letters = '0123456789ABCDEF';
     var color = '#';
@@ -55,28 +118,76 @@ function getRandomPoint() {
     return new Point(x, y);
 }
 
-function randomTriangle() {
-    var p1 = getRandomPoint();
-    var p2 = getRandomPoint();
-    var p3 = getRandomPoint();
-    var color = getRandomColor();
-    return new Triangle(p1, p2, p3, color);
+function getRandomPointNear(p, maxDist) {
+    var x = Math.random() * maxDist;
+    if (Math.random() < .5) x *= -1;
+    x += p.loc.x;
+    var y = Math.random() * maxDist;
+    if (Math.random() < .5) y *= -1;
+    y += p.loc.y;
+    return new Point(x, y);
 }
 
-function fillCanvas(n) {
-    var triangles = []
+function getRandomDir() {
+    var x = Math.random();
+    if (Math.random() < .5) x *= -1;
+    var y = Math.random();
+    if (Math.random() < .5) y *= -1;
+    return new THREE.Vector2(x, y).normalize().divideScalar(5);
+}
+
+function randomTriangle() {
+    var p1 = getRandomPoint();
+    var p2 = getRandomPointNear(p1, 300);
+    var p3 = getRandomPointNear(p1, 300);
+    var color = getRandomColor();
+    var dir = getRandomDir();
+    var density = Math.random() * 5;
+    return new Triangle(p1, p2, p3, color, dir, density);
+}
+
+function randomBezierShape() {
+    var p1 = getRandomPoint();
+    var p2 = getRandomPointNear(p1, 300);
+    var color = getRandomColor();
+    var dir = getRandomDir();
+    var density = Math.random() * 5;
+    return new BezierShape(p1, p2, color, dir, density);
+}
+
+function Simulation(n) {
+    this.shapes = []
     for (var i = 0; i < n; i++) {
-        let tri = randomTriangle();
-        tri.draw();
-        triangles.push(tri);
+        if (i % 4 == 0) {
+            this.shapes.push(randomTriangle());
+        } else {
+            this.shapes.push(randomBezierShape());
+        }
     }
 }
 
-fillCanvas(20);
+Simulation.prototype.drawShapes = function () {
+    for (var i = 0; i < this.shapes.length; i++) {
+        this.shapes[i].draw();
+    }
+}
 
-// function animate() {
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//     tri.step();
-//     tri.draw();
-//     window.requestAnimationFrame(animate);
-// }
+Simulation.prototype.updatePositions = function () {
+    for (var i = 0; i < this.shapes.length; i++) {
+        this.shapes[i].step();
+    }
+}
+
+let animate = function () {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sim.drawShapes();
+    sim.updatePositions();
+    window.requestAnimationFrame(animate);
+}
+
+sim = new Simulation(40);
+animate();
+
+canvas.addEventListener('click', function () {
+    sim = new Simulation(40);
+}, false);
