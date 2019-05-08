@@ -15,7 +15,7 @@ function NewPieCylinder() {
             0,
             2 * Math.PI / 12,
         );
-        const material = KaleidoscopeMaterial();
+        const material = EnclosingKaleidoscopeMaterial();
         const cylinder = new THREE.Mesh(geometry, material);
         material.side = THREE.BackSide; // DoubleSide, FrontSide or BackSide
         cylinder.rotation.x += Math.PI / 2;
@@ -124,7 +124,7 @@ const KaleidoscopeMaterial = () => {
 
 const EnclosingKaleidoscopeMaterial = () => {
     const mat = new THREE.MeshStandardMaterial({
-        color: 0xFFFFFF, metalness: 0.1, map: SingletonKaleidoscopeTexture,
+        color: 0xFFFFFF, metalness: 0.5, map: SingletonKaleidoscopeTexture,
     });
     return mat;
 }
