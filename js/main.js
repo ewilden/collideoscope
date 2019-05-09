@@ -1,6 +1,8 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.z = 8;
+let WorldZRotation = 0;
+const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -129,6 +131,8 @@ document.addEventListener('keyup', (event) => {
 let zDisplacement = 0;
 let prevZDisplacement = 0;
 
+const Z_SPEED = 0.05;
+
 // animate/render loop
 function mainAnimationLoop() {
     requestAnimationFrame(mainAnimationLoop);
@@ -137,10 +141,10 @@ function mainAnimationLoop() {
     let velZ = 0;
     let rotZ = 0;
     if (ArrowUp.isPressed) {
-        velZ += 0.05;
+        velZ += Z_SPEED;
     }
     if (ArrowDown.isPressed) {
-        velZ += -0.05;
+        velZ += -Z_SPEED;
     }
     if (ArrowRight.isPressed) {
         rotZ += -0.05;
@@ -166,16 +170,17 @@ function mainAnimationLoop() {
     }
 
     // move the camera, lights, and player
-    [camera, player, cameraLight].forEach(obj => {
-        obj.rotation.z -= rotZ;
-        obj.position.z -= velZ;
+    WorldZRotation += rotZ;
+    [...barriers, ...enclosingCylinders].forEach(obj => {
+        obj.rotateOnWorldAxis(Z_AXIS, rotZ);
+        obj.position.z += velZ;
     });
     player.position.x += velX;
     player.position.y += velY;
 
     zDisplacement += velZ;
 
-    if (zDisplacement >= BARRIER_STARTING_Z + BARRIER_Z_INCREMENT && (zDisplacement % BARRIER_Z_INCREMENT < 0.2) && (prevZDisplacement % BARRIER_Z_INCREMENT > BARRIER_Z_INCREMENT - 0.8)) {
+    if (zDisplacement >= BARRIER_STARTING_Z + BARRIER_Z_INCREMENT && (zDisplacement % BARRIER_Z_INCREMENT < 0.8) && (prevZDisplacement % BARRIER_Z_INCREMENT > BARRIER_Z_INCREMENT - 0.8)) {
         if (barriers[0]) {
             barriers[0].children.forEach(child => {
                 child.material.dispose();
@@ -187,7 +192,7 @@ function mainAnimationLoop() {
         barriers.push(newBarrier);
         scene.add(newBarrier);
     }
-    if (zDisplacement >= CYLINDER_HEIGHT && (zDisplacement % CYLINDER_HEIGHT < 1) && (prevZDisplacement % CYLINDER_HEIGHT > CYLINDER_HEIGHT - 1)) {
+    if (zDisplacement >= CYLINDER_HEIGHT && (zDisplacement % CYLINDER_HEIGHT < 0.8) && (prevZDisplacement % CYLINDER_HEIGHT > CYLINDER_HEIGHT - 0.8)) {
         if (enclosingCylinders[0]) {
             enclosingCylinders[0].children.forEach(child => {
                 child.material.dispose();
@@ -200,6 +205,7 @@ function mainAnimationLoop() {
         CYLINDER_PARITY = !CYLINDER_PARITY;
         enclosingCylinders.push(newCylinder);
         scene.add(newCylinder);
+        newCylinder.rotateOnWorldAxis(Z_AXIS, WorldZRotation);
     }
 
     // force player to stay within bounds of cylinder
