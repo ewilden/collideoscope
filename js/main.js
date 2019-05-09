@@ -73,6 +73,8 @@ function addKeyAction(keySpec, onDown, onUp) {
     keyActions.push(action);
 }
 
+let isPaused = false;
+
 // add key actions
 const aka = addKeyAction;
 // https://keycode.info
@@ -95,6 +97,8 @@ const boundKeys = [
     KeyS
 ];
 
+const Escape = { key: "Escape", keyCode: 27, isPressed: false };
+
 function watchKey(keyObj) {
     aka(
         keyObj,
@@ -103,6 +107,11 @@ function watchKey(keyObj) {
     );
 }
 boundKeys.forEach(watchKey);
+addKeyAction(
+    Escape,
+    event => { isPaused = !isPaused },
+    event => { },
+);
 
 document.addEventListener('keydown', (event) => {
     keyActions.forEach((action) => {
@@ -172,6 +181,11 @@ function mainAnimationLoop() {
     }
     if (KeyS.isPressed) {
         velY -= 0.05;
+    }
+
+    if (isPaused) {
+        renderer.render(scene, camera);
+        return;
     }
 
     // move the camera, lights, and player
