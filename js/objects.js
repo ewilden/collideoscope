@@ -35,7 +35,7 @@ function NewPieCylinder(startingZ, parity = false) {
             1,
             true
         );
-        const lineMat = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 1.0 });
+        const lineMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.88 });
         lineMat.side = THREE.FrontSide;
         const lineCylinder = new THREE.Mesh(lineGeo, lineMat);
         lineCylinder.rotation.x += Math.PI / 2;
@@ -53,64 +53,6 @@ function NewPieCylinder(startingZ, parity = false) {
     return group;
 }
 
-function NewEnclosingCylinder() {
-    const geometry = new THREE.CylinderGeometry(
-        CYLINDER_RADIUS, // radiusTop
-        CYLINDER_RADIUS, // radiusBottom
-        CYLINDER_HEIGHT, // height
-        32, // radialSegments
-        1, // heightSegments
-        true // openEnded
-    );
-    const material = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0 });
-    const cylinder = new THREE.Mesh(geometry, material);
-    material.side = THREE.BackSide; // DoubleSide, FrontSide or BackSide
-
-    cylinder.rotation.x += Math.PI / 2;
-    const group = new THREE.Group();
-    group.add(cylinder);
-
-    // add wall lines
-    const numWallLines = 12;
-    const lineRadius = 0.01;
-    for (let i = 0; i < numWallLines; ++i) {
-        const lineGeo = new THREE.CylinderGeometry(
-            lineRadius,
-            lineRadius,
-            CYLINDER_HEIGHT,
-            8,
-            1,
-            true
-        );
-        const lineMat = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 1.0 });
-        lineMat.side = THREE.FrontSide;
-        const lineCylinder = new THREE.Mesh(lineGeo, lineMat);
-        lineCylinder.rotation.x += Math.PI / 2;
-        const theta = 2 * Math.PI * i / 12;
-        lineCylinder.position.x = 0.99 * CYLINDER_RADIUS * Math.cos(theta);
-        lineCylinder.position.y = 0.99 * CYLINDER_RADIUS * Math.sin(theta);
-        group.add(lineCylinder);
-    }
-    return group;
-}
-
-function NewBarrier(
-    gapFraction, // the fraction of the disc that should be cut out to form the gap to fly through
-    gapPosition  // the angle (in radians) that the centerline of the gap should be at
-) {
-    const barrierRadius = CYLINDER_RADIUS * 0.99;
-    const geometry = new THREE.CylinderGeometry(barrierRadius, barrierRadius, 2, 32, 1, false, 0, (1 - gapFraction) * 2 * Math.PI);
-    const material = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.5 });
-    const cylinder = new THREE.Mesh(geometry, material);
-    material.side = THREE.FrontSide;
-    cylinder.rotation.x += Math.PI / 2;
-    cylinder.rotation.y += gapFraction * Math.PI + Math.PI / 2 + gapPosition;
-    // cylinder.rotation.y += gapPosition - gapFraction * 2 * Math.PI;
-    const group = new THREE.Group();
-    group.add(cylinder);
-    return group;
-}
-
 const KaleidoscopeTexture = () => {
     const texture = new THREE.CanvasTexture(
         textureCanvas,
@@ -123,14 +65,14 @@ const SingletonKaleidoscopeTexture = KaleidoscopeTexture();
 const KaleidoscopeMaterial = () => {
     const mat = new THREE.MeshStandardMaterial({
         color: 0xFFFFFF, metalness: 0.0, map: SingletonKaleidoscopeTexture,
-        //  transparent: true, opacity: 0.75
+        transparent: true, opacity: 0.75
     });
     return mat;
 }
 
 const EnclosingKaleidoscopeMaterial = () => {
     const mat = new THREE.MeshStandardMaterial({
-        color: 0xFFFFFF, metalness: 0.5, map: SingletonKaleidoscopeTexture,
+        color: 0x888888, metalness: 0.3, map: SingletonKaleidoscopeTexture,
     });
     return mat;
 }
@@ -200,4 +142,12 @@ function NewPlayer() {
     const material = new THREE.MeshStandardMaterial({ color: 0xFF0000, metalness: 0.33 });
     const player = new THREE.Mesh(geometry, material);
     return player;
+}
+
+function NewCylinderEndcap() {
+    const geometry = new THREE.CylinderGeometry(CYLINDER_RADIUS, CYLINDER_RADIUS, 0.1, 32, 1, false);
+    const material = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0 });
+    const cylinder = new THREE.Mesh(geometry, material);
+    cylinder.rotation.x += Math.PI / 2;
+    return cylinder;
 }
