@@ -84,6 +84,7 @@ const KeyA = { key: "a", keyCode: 65, isPressed: false };
 const KeyD = { key: "d", keyCode: 68, isPressed: false };
 const KeyW = { key: "w", keyCode: 87, isPressed: false };
 const KeyS = { key: "s", keyCode: 83, isPressed: false };
+const Space = { key: "Space", keyCode: 32, isPressed: false }
 const boundKeys = [
     ArrowLeft,
     ArrowRight,
@@ -92,7 +93,8 @@ const boundKeys = [
     KeyA,
     KeyD,
     KeyW,
-    KeyS
+    KeyS,
+    Space
 ];
 
 function watchKey(keyObj) {
@@ -158,21 +160,25 @@ function mainAnimationLoop() {
         rotZ += ROTATION_SPEED;
     }
 
+    if (Space.isPressed) {
+	jumped = true;
+    }
+
     // update from WASD movement
     let velX = 0;
     let velY = 0;
-    if (KeyA.isPressed) {
-        velX -= 0.05;
-    }
-    if (KeyD.isPressed) {
-        velX += 0.05;
-    }
-    if (KeyW.isPressed) {
-        velY += 0.05;
-    }
-    if (KeyS.isPressed) {
-        velY -= 0.05;
-    }
+    // if (KeyA.isPressed) {
+    //     velX -= 0.05;
+    // }
+    // if (KeyD.isPressed) {
+    //     velX += 0.05;
+    // }
+    // if (KeyW.isPressed) {
+    //     velY += 0.05;
+    // }
+    // if (KeyS.isPressed) {
+    //     velY -= 0.05;
+    // }
 
     // move the camera, lights, and player
     WorldZRotation += rotZ;
