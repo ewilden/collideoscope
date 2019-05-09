@@ -172,6 +172,10 @@ function mainAnimationLoop() {
 	jumped = true;
     }
 
+    if (Space.isPressed) {
+	jumped = true;
+    }
+
     // update from WASD movement
     let velX = 0;
     let velY = 0;
