@@ -253,11 +253,6 @@ function mainAnimationLoop() {
         }
         currBarrier.checkCollision(player);
     }
-    // let barrierInd = 0;
-    // do {
-    //     barriers[barrierInd].checkCollision(player);
-    //     barrierInd++;
-    // } while (barriers[barrierInd] && barriers[barrierInd].position.z < player.position.z + 1)
 
     renderer.render(scene, camera);
     animate();
