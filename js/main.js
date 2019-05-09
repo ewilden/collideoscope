@@ -21,6 +21,10 @@ const endcap = NewCylinderEndcap();
 endcap.position.z = -CYLINDER_HEIGHT;
 scene.add(endcap);
 
+const tinter = NewCylinderTinter();
+tinter.position.z = 0;
+scene.add(tinter);
+
 const barriers = [];
 
 const NUM_STARTING_BARRIERS = 10;

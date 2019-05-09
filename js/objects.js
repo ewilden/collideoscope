@@ -72,7 +72,7 @@ const KaleidoscopeMaterial = () => {
 
 const EnclosingKaleidoscopeMaterial = () => {
     const mat = new THREE.MeshStandardMaterial({
-        color: 0x888888, metalness: 0.3, map: SingletonKaleidoscopeTexture,
+        color: 0xBB55BB, metalness: 0.6, map: SingletonKaleidoscopeTexture,
     });
     return mat;
 }
@@ -147,6 +147,16 @@ function NewPlayer() {
 function NewCylinderEndcap() {
     const geometry = new THREE.CylinderGeometry(CYLINDER_RADIUS, CYLINDER_RADIUS, 0.1, 32, 1, false);
     const material = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0 });
+    const cylinder = new THREE.Mesh(geometry, material);
+    cylinder.rotation.x += Math.PI / 2;
+    return cylinder;
+}
+
+function NewCylinderTinter() {
+    const radius = 0.99 * CYLINDER_RADIUS;
+    const geometry = new THREE.CylinderGeometry(radius, radius, CYLINDER_HEIGHT * 2, 32, 1, false);
+    const material = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.6, transparent: true, opacity: 0.5 });
+    material.side = THREE.BackSide;
     const cylinder = new THREE.Mesh(geometry, material);
     cylinder.rotation.x += Math.PI / 2;
     return cylinder;
