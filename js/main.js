@@ -147,10 +147,10 @@ function mainAnimationLoop() {
         velZ += -Z_SPEED;
     }
     if (ArrowRight.isPressed) {
-        rotZ += -Z_SPEED;
+        rotZ += -0.05;
     }
     if (ArrowLeft.isPressed) {
-        rotZ += Z_SPEED;
+        rotZ += 0.05;
     }
 
     // update from WASD movement
@@ -180,7 +180,7 @@ function mainAnimationLoop() {
 
     zDisplacement += velZ;
 
-    if (zDisplacement >= BARRIER_STARTING_Z + BARRIER_Z_INCREMENT && (zDisplacement % BARRIER_Z_INCREMENT < 0.2) && (prevZDisplacement % BARRIER_Z_INCREMENT > BARRIER_Z_INCREMENT - 0.8)) {
+    if (zDisplacement >= BARRIER_STARTING_Z + BARRIER_Z_INCREMENT && (zDisplacement % BARRIER_Z_INCREMENT < 0.8) && (prevZDisplacement % BARRIER_Z_INCREMENT > BARRIER_Z_INCREMENT - 0.8)) {
         if (barriers[0]) {
             barriers[0].children.forEach(child => {
                 child.material.dispose();
@@ -192,7 +192,7 @@ function mainAnimationLoop() {
         barriers.push(newBarrier);
         scene.add(newBarrier);
     }
-    if (zDisplacement >= CYLINDER_HEIGHT && (zDisplacement % CYLINDER_HEIGHT < 0.2) && (prevZDisplacement % CYLINDER_HEIGHT > CYLINDER_HEIGHT - 0.2)) {
+    if (zDisplacement >= CYLINDER_HEIGHT && (zDisplacement % CYLINDER_HEIGHT < 0.8) && (prevZDisplacement % CYLINDER_HEIGHT > CYLINDER_HEIGHT - 0.8)) {
         if (enclosingCylinders[0]) {
             enclosingCylinders[0].children.forEach(child => {
                 child.material.dispose();
