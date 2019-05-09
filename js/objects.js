@@ -65,7 +65,7 @@ const SingletonKaleidoscopeTexture = KaleidoscopeTexture();
 const KaleidoscopeMaterial = () => {
     const mat = new THREE.MeshStandardMaterial({
         color: 0xFFFFFF, metalness: 0.0, map: SingletonKaleidoscopeTexture,
-        transparent: true, opacity: 0.75
+	transparent: true, opacity: 0.75
     });
     return mat;
 }
@@ -135,7 +135,7 @@ function NewRandomPieBarrier(startingZ = 0) {
     return barrier;
 }
 
-const PLAYER_RADIUS = 0.2;
+const PLAYER_RADIUS = 0.1;
 
 function NewPlayer() {
     const geometry = new THREE.SphereGeometry(PLAYER_RADIUS, 12, 12);
