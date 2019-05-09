@@ -137,7 +137,7 @@ document.addEventListener('keyup', (event) => {
 let zDisplacement = 0;
 let prevZDisplacement = 0;
 
-const Z_SPEED = 0.05;
+const Z_SPEED = 0.07;
 const ROTATION_SPEED = 0.05;
 
 // animate/render loop
@@ -155,9 +155,13 @@ function mainAnimationLoop() {
     }
     if (ArrowRight.isPressed) {
         rotZ += -ROTATION_SPEED;
+	rotating = true;
+	clockwise = true;
     }
     if (ArrowLeft.isPressed) {
         rotZ += ROTATION_SPEED;
+	rotating = true;
+	clockwise = false;
     }
 
     if (Space.isPressed) {

@@ -16,11 +16,39 @@ function touchingCylinder() {
 var jumped = false;
 function handleJump() {
     jumped = false;
-    if (!touchingCylinder()) { return; }
-    velocity = new THREE.Vector3();
-    let jumpForce = player.position.clone().negate().setLength(CYLINDER_RADIUS - PLAYER_RADIUS);
-    jumpForce.divideScalar(1.05);
-    netForces.copy(jumpForce);
+    if (touchingCylinder()) {
+	velocity = new THREE.Vector3();
+	let jumpForce = player.position.clone().negate().setLength(CYLINDER_RADIUS - PLAYER_RADIUS);
+	jumpForce.divideScalar(1.05);
+	netForces.copy(jumpForce);
+    } 
+}
+
+function tangentToCylinder(clockwise) {
+    let tangent = player.position.clone().setZ(0);
+    
+    let angle;
+    if (clockwise)  {
+	angle = Math.PI/2;
+    }
+    else {
+	angle = -Math.PI/2;
+    }
+
+    tangent.applyAxisAngle(Z_AXIS, angle);
+    return tangent;
+}
+
+var rotating = false;
+var clockwise = false;
+function rotateBallWithCylinder() {
+    if (!rotating || !touchingCylinder()) return;
+
+    let tan = tangentToCylinder(clockwise);
+    tan.divideScalar(70);
+    netForces.add(tan);
+
+    rotating = false;
 }
 
 function addGravity() {
@@ -29,7 +57,7 @@ function addGravity() {
 
 function updateBallVelocity() {
     velocity.add(netForces);
-    netForces = new THREE.Vector3(0, 0, 0);
+    netForces = new THREE.Vector3();
 }
 
 function updateBallPosition() {
@@ -38,11 +66,12 @@ function updateBallPosition() {
 }
 
 function simulateForces() {
+    netForces = new THREE.Vector3();
     if (jumped) {
-	console.log("handling jump")
 	handleJump();
     }
     addGravity();
+    rotateBallWithCylinder();
     updateBallVelocity();
     updateBallPosition();
 }
