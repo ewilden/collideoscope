@@ -128,17 +128,13 @@ function NewPieBarrier(
             );
         }
         // for debugging
-        const possHexes = [0x0000ff, 0xff0000, 0x00ff00, 0xf0f0f0, 0xff00ff, 0x123456];
         edgePointsToTest.forEach(point => {
             const rayToPoint = new THREE.Vector3().subVectors(point, barrierCenter).normalize();
             const raycaster = new THREE.Raycaster(barrierCenter, rayToPoint, 0, CYLINDER_RADIUS);
             const intersections = raycaster.intersectObject(player);
             if (intersections.length > 0) {
-                if (player.debugHexInd == null) {
-                    player.debugHexInd = 0;
-                }
-                player.debugHexInd = (player.debugHexInd + 1) % possHexes.length;
-                player.material.color.setHex(possHexes[player.debugHexInd]);
+                const randColor = Math.floor(Math.random() * (0xffffff));
+                player.material.color.setHex(randColor);
                 console.log("hit");
             }
         });
