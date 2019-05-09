@@ -17,6 +17,10 @@ const enclosingCylinders = [
     NewPieCylinder(-CYLINDER_HEIGHT, true),
 ];
 
+const endcap = NewCylinderEndcap();
+endcap.position.z = -CYLINDER_HEIGHT;
+scene.add(endcap);
+
 const barriers = [];
 
 const NUM_STARTING_BARRIERS = 10;

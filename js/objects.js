@@ -143,3 +143,11 @@ function NewPlayer() {
     const player = new THREE.Mesh(geometry, material);
     return player;
 }
+
+function NewCylinderEndcap() {
+    const geometry = new THREE.CylinderGeometry(CYLINDER_RADIUS, CYLINDER_RADIUS, 0.1, 32, 1, false);
+    const material = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0 });
+    const cylinder = new THREE.Mesh(geometry, material);
+    cylinder.rotation.x += Math.PI / 2;
+    return cylinder;
+}
