@@ -155,25 +155,25 @@ function mainAnimationLoop() {
     }
     if (ArrowRight.isPressed) {
         rotZ += -ROTATION_SPEED;
-	rotating = true;
-	clockwise = true;
+        rotating = true;
+        clockwise = true;
     }
     if (ArrowLeft.isPressed) {
         rotZ += ROTATION_SPEED;
-	rotating = true;
-	clockwise = false;
+        rotating = true;
+        clockwise = false;
     }
 
     if (Space.isPressed) {
-	jumped = true;
+        jumped = true;
     }
 
     if (Space.isPressed) {
-	jumped = true;
+        jumped = true;
     }
 
     if (Space.isPressed) {
-	jumped = true;
+        jumped = true;
     }
 
     // update from WASD movement
@@ -244,6 +244,16 @@ function mainAnimationLoop() {
     camera.position.z = CAMERA_DISTANCE_FROM_PLAYER + player.position.z;
 
     simulatePhysics();
+
+    // check collisions
+    for (let i = 0; i < barriers.length; ++i) {
+        const currBarrier = barriers[i];
+        if (currBarrier.position.z < player.position.z - 4) {
+            break;
+        }
+        currBarrier.checkCollision(player);
+    }
+
     renderer.render(scene, camera);
     animate();
 

@@ -65,7 +65,7 @@ const SingletonKaleidoscopeTexture = KaleidoscopeTexture();
 const KaleidoscopeMaterial = () => {
     const mat = new THREE.MeshStandardMaterial({
         color: 0xFFFFFF, metalness: 0.0, map: SingletonKaleidoscopeTexture,
-	transparent: true, opacity: 0.75
+        transparent: true, opacity: 0.75
     });
     return mat;
 }
@@ -110,6 +110,35 @@ function NewPieBarrier(
     slices.forEach(slice => group.add(slice));
     const gapFraction = 1 - numSlices / TOTAL_NUM_SLICES;
     group.rotation.z += gapFraction * Math.PI + Math.PI / 2 + gapPosition;
+    group.WorldZRotationWhenCreated = WorldZRotation;
+
+    group.checkCollision = function (player) {
+        const barrierCenter = new THREE.Vector3(0, 0, group.position.z + 0.5);
+        const updatedGapPosition = gapPosition + WorldZRotation - group.WorldZRotationWhenCreated;
+        const gapWidth = (1 - (numSlices / TOTAL_NUM_SLICES)) * 2 * Math.PI;
+        const startingDeg = updatedGapPosition + gapWidth / 2;
+        const degIncr = SLICE_ANGLE / 2;
+        const edgePointsToTest = [];
+        for (let i = 0; i < numSlices * 2 + 1; i++) {
+            const currDeg = startingDeg + i * degIncr;
+            edgePointsToTest.push(
+                new THREE.Vector3(Math.cos(currDeg) * CYLINDER_RADIUS,
+                    Math.sin(currDeg) * CYLINDER_RADIUS,
+                    barrierCenter.z)
+            );
+        }
+        // for debugging
+        edgePointsToTest.forEach(point => {
+            const rayToPoint = new THREE.Vector3().subVectors(point, barrierCenter).normalize();
+            const raycaster = new THREE.Raycaster(barrierCenter, rayToPoint, 0, CYLINDER_RADIUS);
+            const intersections = raycaster.intersectObject(player);
+            if (intersections.length > 0) {
+                const randColor = Math.floor(Math.random() * (0xffffff));
+                player.material.color.setHex(randColor);
+                console.log("hit");
+            }
+        });
+    }
     return group;
 }
 
