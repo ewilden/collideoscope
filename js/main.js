@@ -132,6 +132,7 @@ let zDisplacement = 0;
 let prevZDisplacement = 0;
 
 const Z_SPEED = 0.05;
+const ROTATION_SPEED = 0.05;
 
 // animate/render loop
 function mainAnimationLoop() {
@@ -147,10 +148,10 @@ function mainAnimationLoop() {
         velZ += -Z_SPEED;
     }
     if (ArrowRight.isPressed) {
-        rotZ += -0.05;
+        rotZ += -ROTATION_SPEED;
     }
     if (ArrowLeft.isPressed) {
-        rotZ += 0.05;
+        rotZ += ROTATION_SPEED;
     }
 
     // update from WASD movement

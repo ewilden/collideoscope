@@ -35,7 +35,7 @@ function NewPieCylinder(startingZ, parity = false) {
             1,
             true
         );
-        const lineMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.0 });
+        const lineMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, metalness: 0.88 });
         lineMat.side = THREE.FrontSide;
         const lineCylinder = new THREE.Mesh(lineGeo, lineMat);
         lineCylinder.rotation.x += Math.PI / 2;
