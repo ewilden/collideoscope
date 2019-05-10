@@ -25,7 +25,7 @@ const enclosingCylinders = [
 
 const endcap = NewCylinderEndcap();
 endcap.position.z = -CYLINDER_HEIGHT;
-scene.add(endcap);
+//scene.add(endcap);
 
 const barriers = [];
 
@@ -188,22 +188,24 @@ let zDisplacement = 0;
 let prevZDisplacement = 0;
 
 let zDispAtPrevBarrierAddition = 0;
-const Z_SPEED = 0.08;
 const ROTATION_SPEED = 0.01;
+const MIN_Z_SPEED = 0.07;
+const MAX_Z_SPEED = 0.15;
+let currentSpeed = MIN_Z_SPEED;
+
+function increaseDifficulty() {
+    //console.log(currentSpeed)
+    if (currentSpeed < MAX_Z_SPEED) {
+	currentSpeed += 0.00006;
+    } 
+}
 
 // animate/render loop
 function mainAnimationLoop() {
     requestAnimationFrame(mainAnimationLoop);
 
     // update rotation and depth velocity
-    let velZ = 0.08;
     let rotZ = 0;
-    if (ArrowUp.isPressed) {
-        velZ += Z_SPEED;
-    }
-    if (ArrowDown.isPressed) {
-        velZ += -Z_SPEED;
-    }
     if (ArrowRight.isPressed) {
         rotZ += -ROTATION_SPEED;
         rotating = true;
@@ -230,32 +232,15 @@ function mainAnimationLoop() {
     if (isPaused) {
         return;
     }
-    // update from WASD movement
-    let velX = 0;
-    let velY = 0;
-    // if (KeyA.isPressed) {
-    //     velX -= 0.05;
-    // }
-    // if (KeyD.isPressed) {
-    //     velX += 0.05;
-    // }
-    // if (KeyW.isPressed) {
-    //     velY += 0.05;
-    // }
-    // if (KeyS.isPressed) {
-    //     velY -= 0.05;
-    // }
 
     // move the camera, lights, and player
     WorldZRotation += rotZ;
     [...barriers, ...enclosingCylinders].forEach(obj => {
         obj.rotateOnWorldAxis(Z_AXIS, rotZ);
-        obj.position.z += velZ;
+        obj.position.z += currentSpeed;
     });
-    player.position.x += velX;
-    player.position.y += velY;
 
-    zDisplacement += velZ;
+    zDisplacement += currentSpeed;
 
     // destroy barriers that are behind the camera
     while (barriers[0] && barriers[0].position.z > camera.position.z) {
@@ -308,6 +293,7 @@ function mainAnimationLoop() {
 
     renderer.render(scene, camera);
     animate();
+    increaseDifficulty();
 
     SingletonKaleidoscopeTexture.needsUpdate = true;
     prevZDisplacement = zDisplacement;
