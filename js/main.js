@@ -6,6 +6,7 @@ const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
 let inLosingState = false;
 let inPracticeMode = false;
+let recordDistance = 0;
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -143,16 +144,22 @@ const pauseOrUnpause = event => {
 
 const losemenu = document.getElementById("losemenu");
 const scoreboard = document.getElementById("scoreboard");
+const record = document.getElementById("record");
 function youLose() {
     if (inLosingState || inPracticeMode) {
         return;
     }
     inLosingState = true;
     scoreboard.textContent = `${Math.round(zDisplacement - zWhenStartedLife)}`;
+
+    recordDistance = Math.max(zDisplacement - zWhenStartedLife, recordDistance) 
+    record.textContent = `${Math.round(recordDistance)}`
+
     losemenu.classList.add("ispaused");
     currentSpeed = MIN_Z_SPEED;
 }
 function restartAfterLoss() {
+    Space.isPressed = false;
     zWhenStartedLife = zDisplacement;
     losemenu.classList.remove('ispaused');
     inLosingState = false;
@@ -185,6 +192,7 @@ addKeyAction(
             pausemenu.classList.remove("ispaused");
             isPaused = false;
         }
+	if (inLosingState) restartAfterLoss();
     },
     event => { },
 );
@@ -262,14 +270,6 @@ function mainAnimationLoop() {
             rotZ += ROTATION_SPEED;
             rotating = true;
             clockwise = false;
-        }
-
-        if (Space.isPressed) {
-            jumped = true;
-        }
-
-        if (Space.isPressed) {
-            jumped = true;
         }
 
         if (Space.isPressed) {

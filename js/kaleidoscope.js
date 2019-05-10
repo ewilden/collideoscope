@@ -12,7 +12,7 @@ const ctx = canvas.getContext('2d');
 ctx.fillStyle = "#111";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-const NUM_SHAPES = 150;
+const NUM_SHAPES = 120;
 
 var colors = [
     "blue",
