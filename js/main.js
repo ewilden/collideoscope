@@ -146,6 +146,8 @@ document.addEventListener('keyup', (event) => {
 let zDisplacement = 0;
 let prevZDisplacement = 0;
 
+let zDispAtPrevBarrierAddition = 0;
+
 const Z_SPEED = 0.07;
 const ROTATION_SPEED = 0.05;
 
@@ -216,32 +218,32 @@ function mainAnimationLoop() {
 
     zDisplacement += velZ;
 
-    if (zDisplacement >= BARRIER_STARTING_Z + BARRIER_Z_INCREMENT && (zDisplacement % BARRIER_Z_INCREMENT < 0.8) && (prevZDisplacement % BARRIER_Z_INCREMENT > BARRIER_Z_INCREMENT - 0.8)) {
-        if (barriers[0]) {
-            barriers[0].children.forEach(child => {
-                child.material.dispose();
-            });
-            scene.remove(barriers[0]);
-            barriers.shift();
-        }
+    // destroy barriers that are behind the camera
+    while (barriers[0] && barriers[0].position.z > camera.position.z) {
         const newBarrier = NewRandomPieBarrier(barriers[barriers.length - 1].position.z - BARRIER_Z_INCREMENT);
         barriers.push(newBarrier);
         scene.add(newBarrier);
+
+        barriers[0].children.forEach(child => {
+            child.material.dispose();
+        });
+        scene.remove(barriers[0]);
+        barriers.shift();
     }
-    if (zDisplacement >= CYLINDER_HEIGHT && (zDisplacement % CYLINDER_HEIGHT < 0.8) && (prevZDisplacement % CYLINDER_HEIGHT > CYLINDER_HEIGHT - 0.8)) {
-        if (enclosingCylinders[0]) {
-            enclosingCylinders[0].children.forEach(child => {
-                child.material.dispose();
-                child.geometry.dispose();
-            });
-            scene.remove(enclosingCylinders[0]);
-            enclosingCylinders.shift();
-        }
+
+    // destroy cylinders that are behind the camera
+    while (enclosingCylinders[0] && enclosingCylinders[0].position.z > camera.position.z + CYLINDER_HEIGHT) {
         const newCylinder = NewPieCylinder(enclosingCylinders[enclosingCylinders.length - 1].position.z - CYLINDER_HEIGHT, CYLINDER_PARITY);
         CYLINDER_PARITY = !CYLINDER_PARITY;
         enclosingCylinders.push(newCylinder);
         scene.add(newCylinder);
         newCylinder.rotateOnWorldAxis(Z_AXIS, WorldZRotation);
+        enclosingCylinders[0].children.forEach(child => {
+            child.material.dispose();
+            child.geometry.dispose();
+        });
+        scene.remove(enclosingCylinders[0]);
+        enclosingCylinders.shift();
     }
 
     // reposition camera based on player
