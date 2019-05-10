@@ -145,10 +145,12 @@ function NewPieBarrier(
             const intersections = raycaster.intersectObject(player);
             if (intersections.length > 0) {
                 hasIntersected = true;
-                youLose();
                 // make sure new color is noticeably different from old one
-                const randColor = Math.floor(Math.random() * (0xaaaaaa) + 0x200000);
-                player.material.color.setHex((randColor + player.material.color.getHex()) % 0xffffff);
+		if (!inLosingState) {
+		    const randColor = Math.floor(Math.random() * (0xaaaaaa) + 0x200000);
+		    player.material.color.setHex((randColor + player.material.color.getHex()) % 0xffffff);
+		}
+                youLose();
             }
         });
     }
@@ -200,7 +202,7 @@ const PLAYER_RADIUS = 0.1;
 
 function NewPlayer() {
     const geometry = new THREE.SphereGeometry(PLAYER_RADIUS, 12, 12);
-    const material = new THREE.MeshStandardMaterial({ color: 0xFF0000, metalness: 0.33 });
+    const material = new THREE.MeshStandardMaterial({ color: 0xFF0000, metalness: 0.60 });
     const player = new THREE.Mesh(geometry, material);
     return player;
 }
