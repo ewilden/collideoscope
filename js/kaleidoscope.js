@@ -13,6 +13,19 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 const NUM_SHAPES = 150;
 
+
+var colors = [
+    "blue",
+    "red",
+    "green",
+    "yellow",
+    "violet",
+    "orange",
+]
+var currentLevel = 0;
+var levelTime = 0;
+var levelLength = 600;
+
 //********************************* Points ***********************************//
 function Point(x, y, dir) {
     this.loc = new THREE.Vector2(x, y);
@@ -58,8 +71,8 @@ function Triangle(p1, p2, p3, color, dirVec, density) {
     this.p3 = p3;
 
     this.color = color;
-    this.transitionStep = 300;
-    this.totalSteps = 300;
+    this.transitionStep = 100;
+    this.totalSteps = 100;
 
     this.dir = dirVec.multiplyScalar(density);
 }
@@ -113,8 +126,8 @@ function BezierShape(p1, p2, color, dirVec, density) {
     this.dir = dirVec.multiplyScalar(density);
 
     this.color = color;
-    this.transitionStep = 300;
-    this.totalSteps = 300;
+    this.transitionStep = 100;
+    this.totalSteps = 100;
 
     var mid = p1.midpointTo(p2);
     this.ctrl1 = mid.addNoise(100, 300);
@@ -170,6 +183,8 @@ BezierShape.prototype.evolveColor = function() {
 
 // https://stackoverflow.com/questions/1484506/random-color-generator
 function getRandomColor() {
+    if (Math.random() > .6) 
+	return new THREE.Color(colors[currentLevel % colors.length]);
     return new THREE.Color(Math.random() * 0xFFFFFF);
 }
 
@@ -244,6 +259,11 @@ Simulation.prototype.updatePositions = function () {
 let animate;
 if (IS_KALEIDOSCOPE_SIM) {
     animate = function () {
+	if (levelTime == levelLength) {
+	    levelTime = 0;
+	    currentLevelColor = nextLevelColor;
+	}
+	levelTime += 1;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         sim.drawShapes();
         sim.updatePositions();
@@ -251,6 +271,12 @@ if (IS_KALEIDOSCOPE_SIM) {
     }
 } else {
     animate = function () {
+	if (levelTime == levelLength) {
+	    currentLevel += 1;
+	    levelTime = 0;
+	}
+	levelTime += 1;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.fillStyle = "#111";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
