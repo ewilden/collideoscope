@@ -4,6 +4,7 @@ if (IS_KALEIDOSCOPE_SIM) {
 } else {
     canvas = document.createElement('canvas');
 }
+
 canvas.width = 1024;
 canvas.height = 1024;
 const textureCanvas = canvas;
@@ -13,18 +14,24 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 const NUM_SHAPES = 150;
 
-
 var colors = [
     "blue",
     "red",
-    "green",
-    "yellow",
     "violet",
+    "yellow",
+    "green",
+    "aqua",
+    "maroon",
+    "teal",
+    "lime",
+    "navy",
     "orange",
+    "deeppink",
 ]
+
 var currentLevel = 0;
 var levelTime = 0;
-var levelLength = 600;
+var levelLength = 1200;
 
 //********************************* Points ***********************************//
 function Point(x, y, dir) {
@@ -183,7 +190,7 @@ BezierShape.prototype.evolveColor = function() {
 
 // https://stackoverflow.com/questions/1484506/random-color-generator
 function getRandomColor() {
-    if (Math.random() > .6) 
+    if (Math.random() < .6) 
 	return new THREE.Color(colors[currentLevel % colors.length]);
     return new THREE.Color(Math.random() * 0xFFFFFF);
 }
