@@ -123,9 +123,10 @@ function NewPieBarrier(
         const updatedGapPosition = gapPosition + WorldZRotation - group.WorldZRotationWhenCreated;
         const gapWidth = (1 - (numSlices / TOTAL_NUM_SLICES)) * 2 * Math.PI;
         const startingDeg = updatedGapPosition + gapWidth / 2;
-        const degIncr = SLICE_ANGLE / 2;
+        const numPointsToTest = numSlices * 4 + 1;
+        const degIncr = SLICE_ANGLE * numSlices / (numPointsToTest - 1);
         const edgePointsToTest = [];
-        for (let i = 0; i < numSlices * 2 + 1; i++) {
+        for (let i = 0; i < numPointsToTest; i++) {
             const currDeg = startingDeg + i * degIncr;
             edgePointsToTest.push(
                 new THREE.Vector3(Math.cos(currDeg) * CYLINDER_RADIUS,
@@ -139,8 +140,9 @@ function NewPieBarrier(
             const raycaster = new THREE.Raycaster(barrierCenter, rayToPoint, 0, CYLINDER_RADIUS);
             const intersections = raycaster.intersectObject(player);
             if (intersections.length > 0) {
-                const randColor = Math.floor(Math.random() * (0xffffff));
-                player.material.color.setHex(randColor);
+                // make sure new color is noticeably different from old one
+                const randColor = Math.floor(Math.random() * (0xaaaaaa) + 0x200000);
+                player.material.color.setHex((randColor + player.material.color.getHex()) % 0xffffff);
                 console.log("hit");
             }
         });
