@@ -153,6 +153,7 @@ addKeyAction(
 );
 
 pauseOrUnpause();
+renderer.render(scene, camera);
 
 document.addEventListener('keydown', (event) => {
     keyActions.forEach((action) => {
@@ -227,7 +228,6 @@ function mainAnimationLoop() {
     }
 
     if (isPaused) {
-        renderer.render(scene, camera);
         return;
     }
     // update from WASD movement
@@ -265,9 +265,6 @@ function mainAnimationLoop() {
         scene.add(newBarrier);
 
         // dispose of old barrier
-        barriers[0].children.forEach(child => {
-            child.material.dispose();
-        });
         scene.remove(barriers[0]);
         barriers.shift();
     }
@@ -282,10 +279,6 @@ function mainAnimationLoop() {
         newCylinder.rotateOnWorldAxis(Z_AXIS, WorldZRotation);
 
         // dispose of old cylinder
-        enclosingCylinders[0].children.forEach(child => {
-            child.material.dispose();
-            child.geometry.dispose();
-        });
         scene.remove(enclosingCylinders[0]);
         enclosingCylinders.shift();
     }

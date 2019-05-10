@@ -1,21 +1,23 @@
 const CYLINDER_RADIUS = 1;
 const CYLINDER_HEIGHT = 20;
 
+const EnclosingCylinderGeometry = new THREE.CylinderGeometry(
+    CYLINDER_RADIUS, // radiusTop
+    CYLINDER_RADIUS, // radiusBottom
+    CYLINDER_HEIGHT, // height
+    32, // radialSegments
+    1, // heightSegments
+    true, // openEnded
+    0,
+    2 * Math.PI / 12,
+);
+
 function NewPieCylinder(startingZ, parity = false) {
     const group = new THREE.Group();
     const sliceAngle = 2 * Math.PI / 12;
     for (let i = 0; i < 12; ++i) {
-        const geometry = new THREE.CylinderGeometry(
-            CYLINDER_RADIUS, // radiusTop
-            CYLINDER_RADIUS, // radiusBottom
-            CYLINDER_HEIGHT, // height
-            32, // radialSegments
-            1, // heightSegments
-            true, // openEnded
-            0,
-            2 * Math.PI / 12,
-        );
-        const material = EnclosingKaleidoscopeMaterial();
+        const geometry = EnclosingCylinderGeometry;
+        const material = SingletonEnclosingKaleidoscopeMaterial;
         const cylinder = new THREE.Mesh(geometry, material);
         material.side = THREE.BackSide; // DoubleSide, FrontSide or BackSide
         cylinder.rotation.x += Math.PI / 2;
@@ -70,12 +72,16 @@ const KaleidoscopeMaterial = () => {
     return mat;
 }
 
+const SingletonKaleidoscopeMaterial = KaleidoscopeMaterial();
+
 const EnclosingKaleidoscopeMaterial = () => {
     const mat = new THREE.MeshStandardMaterial({
         color: 0x888888, metalness: 0.3, map: SingletonKaleidoscopeTexture,
     });
     return mat;
 }
+
+const SingletonEnclosingKaleidoscopeMaterial = EnclosingKaleidoscopeMaterial();
 
 const TOTAL_NUM_SLICES = 12;
 const SLICE_ANGLE = 2 * Math.PI / TOTAL_NUM_SLICES;
