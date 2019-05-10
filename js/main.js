@@ -220,10 +220,12 @@ function mainAnimationLoop() {
 
     // destroy barriers that are behind the camera
     while (barriers[0] && barriers[0].position.z > camera.position.z) {
+        // add new barrier to replace the old one
         const newBarrier = NewRandomPieBarrier(barriers[barriers.length - 1].position.z - BARRIER_Z_INCREMENT);
         barriers.push(newBarrier);
         scene.add(newBarrier);
 
+        // dispose of old barrier
         barriers[0].children.forEach(child => {
             child.material.dispose();
         });
@@ -232,12 +234,15 @@ function mainAnimationLoop() {
     }
 
     // destroy cylinders that are behind the camera
-    while (enclosingCylinders[0] && enclosingCylinders[0].position.z > camera.position.z + CYLINDER_HEIGHT) {
+    while (enclosingCylinders[0] && enclosingCylinders[0].position.z > camera.position.z + CYLINDER_HEIGHT / 2) {
+        // add new cylinder to replace the old one
         const newCylinder = NewPieCylinder(enclosingCylinders[enclosingCylinders.length - 1].position.z - CYLINDER_HEIGHT, CYLINDER_PARITY);
         CYLINDER_PARITY = !CYLINDER_PARITY;
         enclosingCylinders.push(newCylinder);
         scene.add(newCylinder);
         newCylinder.rotateOnWorldAxis(Z_AXIS, WorldZRotation);
+
+        // dispose of old cylinder
         enclosingCylinders[0].children.forEach(child => {
             child.material.dispose();
             child.geometry.dispose();
