@@ -87,7 +87,7 @@ const BARRIER_RADIUS = CYLINDER_RADIUS;
 const PieBarrierGeometry = new THREE.CylinderGeometry(BARRIER_RADIUS, BARRIER_RADIUS, 1, 32, 1, false, 0, SLICE_ANGLE);
 
 function NewPieBarrier(
-    numSlices, // how many 1/6-th slices are in the barrier
+    numSlices, // how many 1/12-th slices are in the barrier
     gapPosition, // the angle (in radians) that the centerline of the gap in the barrier should be at
 ) {
     const slices = [];
