@@ -25,7 +25,7 @@ const barriers = [];
 
 const NUM_STARTING_BARRIERS = 10;
 const BARRIER_STARTING_Z = 4;
-const BARRIER_Z_INCREMENT = 4;
+const BARRIER_Z_INCREMENT = 8;
 for (let i = 0; i < NUM_STARTING_BARRIERS; ++i) {
     barriers.push(NewRandomPieBarrier(BARRIER_STARTING_Z - i * BARRIER_Z_INCREMENT));
 }
@@ -146,8 +146,8 @@ document.addEventListener('keyup', (event) => {
 let zDisplacement = 0;
 let prevZDisplacement = 0;
 
-const Z_SPEED = 0.07;
-const ROTATION_SPEED = 0.05;
+const Z_SPEED = 0.08;
+const ROTATION_SPEED = 0.006;
 
 // animate/render loop
 function mainAnimationLoop() {
