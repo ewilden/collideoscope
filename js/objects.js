@@ -143,7 +143,7 @@ function NewPieBarrier(
                 // make sure new color is noticeably different from old one
                 const randColor = Math.floor(Math.random() * (0xaaaaaa) + 0x200000);
                 player.material.color.setHex((randColor + player.material.color.getHex()) % 0xffffff);
-                console.log("hit");
+		currentSpeed = MIN_Z_SPEED;
             }
         });
     }
@@ -154,14 +154,32 @@ function NewPieBarrier(
 let prevSlices = -1;
 let prevRotationAngle = -1;
 
+sliceProbabilities = [0.05, 0.15, 0.5, 0.8, 1]
 function NewRandomPieBarrier(startingZ = 0) {
-    const minPossibleSlices = 6;
-    const maxPossibleSlices = 10;
+    // const minPossibleSlices = 6;
+    // const maxPossibleSlices = 10;
+    // let numSlices;
+    // do {
+    //     numSlices = Math.floor(Math.random() * (maxPossibleSlices - minPossibleSlices + 1)) + minPossibleSlices;
+    // } while (prevSlices === numSlices);
+    // prevSlices = numSlices;
+
     let numSlices;
-    do {
-        numSlices = Math.floor(Math.random() * (maxPossibleSlices - minPossibleSlices + 1)) + minPossibleSlices;
-    } while (prevSlices === numSlices);
-    prevSlices = numSlices;
+    let r = Math.random();
+    for (var i = 0; i < sliceProbabilities.length; i++) {
+	if (r < sliceProbabilities[i]) {
+	    numSlices = (i * 2) + 2;
+
+	    if (numSlices == 10 && prevSlices == 10) {
+		r = Math.random();
+		i = 0;
+	    } else {
+		break;
+	    }
+	}
+    }
+
+
     let rotationAngle;
     do {
         rotationAngle = Math.floor(Math.random() * 6) * Math.PI * 2 / 6;
