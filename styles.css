@@ -8,14 +8,15 @@
 
 .overlaytext {
     text-align: center;
-    font-size: 80px;
+    font-size: 12vh;
 }
 
 .pausesubtext {
-    font-size: 48px;
+    font-size: 7vh;
 }
 
 .overlay {
+    line-height: 6vh;
     position: absolute;
     left: 0;
     top: 0;
@@ -49,9 +50,9 @@
 .practicetext {
     padding: 5px 10px 10px;
     position: absolute;
-    right: 40px;
-    bottom: 40px;
+    right: 4vw;
+    bottom: 4vh;
     color: #FFFFFF;
     z-index: 2;
-    font-size: 36px;
+    font-size: 3.5vw;
 }
