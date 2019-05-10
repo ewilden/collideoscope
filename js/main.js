@@ -86,7 +86,8 @@ const KeyA = { key: "a", keyCode: 65, isPressed: false };
 const KeyD = { key: "d", keyCode: 68, isPressed: false };
 const KeyW = { key: "w", keyCode: 87, isPressed: false };
 const KeyS = { key: "s", keyCode: 83, isPressed: false };
-const Space = { key: "Space", keyCode: 32, isPressed: false }
+const Space = { key: "Space", keyCode: 32, isPressed: false };
+const KeyP = { key: "p", keyCode: 80, isPressed: false };
 const boundKeys = [
     ArrowLeft,
     ArrowRight,
@@ -101,6 +102,8 @@ const boundKeys = [
 
 const Escape = { key: "Escape", keyCode: 27, isPressed: false };
 
+const pausemenu = document.getElementById("pausemenu");
+
 function watchKey(keyObj) {
     aka(
         keyObj,
@@ -109,11 +112,41 @@ function watchKey(keyObj) {
     );
 }
 boundKeys.forEach(watchKey);
+const pauseOrUnpause = event => {
+    if (!isPaused) {
+        // becoming paused
+        pausemenu.classList.add("ispaused");
+        isPaused = true;
+
+    } else {
+        // becoming unpaused
+        pausemenu.classList.remove("ispaused");
+        isPaused = false;
+    }
+};
+
 addKeyAction(
     Escape,
-    event => { isPaused = !isPaused },
+    pauseOrUnpause,
     event => { },
 );
+addKeyAction(
+    KeyP,
+    pauseOrUnpause,
+    event => { },
+);
+addKeyAction(
+    Space,
+    event => {
+        if (isPaused) {
+            pausemenu.classList.remove("ispaused");
+            isPaused = false;
+        }
+    },
+    event => { },
+);
+
+pauseOrUnpause();
 
 document.addEventListener('keydown', (event) => {
     keyActions.forEach((action) => {
