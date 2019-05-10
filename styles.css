@@ -14,7 +14,10 @@
 .pausesubtext {
     font-size: 7vh;
 }
-
+.names {
+    font-size: 5vh;
+    margin-top: -2vh;
+}
 .overlay {
     line-height: 6vh;
     position: absolute;
