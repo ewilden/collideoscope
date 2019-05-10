@@ -115,6 +115,8 @@ const boundKeys = [
 const Escape = { key: "Escape", keyCode: 27, isPressed: false };
 
 const pausemenu = document.getElementById("pausemenu");
+const currspeednode = document.getElementById("currspeed");
+const speedmenu = document.getElementById("speedmenu");
 
 function watchKey(keyObj) {
     aka(
@@ -152,8 +154,8 @@ function youLose() {
     inLosingState = true;
     scoreboard.textContent = `${Math.round(zDisplacement - zWhenStartedLife)}`;
 
-    recordDistance = Math.max(zDisplacement - zWhenStartedLife, recordDistance) 
-    record.textContent = `${Math.round(recordDistance)}`
+    recordDistance = Math.max(zDisplacement - zWhenStartedLife, recordDistance);
+    record.textContent = `${Math.round(recordDistance)}`;
 
     losemenu.classList.add("ispaused");
     currentSpeed = MIN_Z_SPEED;
@@ -175,12 +177,19 @@ const practicemodetext = document.getElementById("practicemode");
 addKeyAction(
     KeyP,
     event => {
+        if (inLosingState) {
+            return;
+        }
         if (inPracticeMode) {
             practicemodetext.classList.remove("ispractice");
+            speedmenu.classList.remove("ispractice");
             inPracticeMode = false;
+            zWhenStartedLife = zDisplacement;
+            currentSpeed = MIN_Z_SPEED;
         } else {
             inPracticeMode = true;
             practicemodetext.classList.add("ispractice");
+            speedmenu.classList.add("ispractice");
         }
     },
     event => { },
@@ -192,7 +201,7 @@ addKeyAction(
             pausemenu.classList.remove("ispaused");
             isPaused = false;
         }
-	if (inLosingState) restartAfterLoss();
+        if (inLosingState) { restartAfterLoss(); }
     },
     event => { },
 );
@@ -274,6 +283,16 @@ function mainAnimationLoop() {
 
         if (Space.isPressed) {
             jumped = true;
+        }
+
+        if (inPracticeMode) {
+            if (ArrowUp.isPressed) {
+                currentSpeed = Math.min(MAX_Z_SPEED, currentSpeed + 0.005);
+            }
+            if (ArrowDown.isPressed) {
+                currentSpeed = Math.max(MIN_Z_SPEED, currentSpeed - 0.005);
+            }
+            currspeednode.textContent = `${Math.floor(currentSpeed * 600 * 2.23694) / 10}`;
         }
 
         if (isPaused) {
