@@ -155,7 +155,7 @@ let prevSlices = -1;
 let prevRotationAngle = -1;
 
 function NewRandomPieBarrier(startingZ = 0) {
-    const minPossibleSlices = 2;
+    const minPossibleSlices = 6;
     const maxPossibleSlices = 10;
     let numSlices;
     do {
