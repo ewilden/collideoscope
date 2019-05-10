@@ -10,21 +10,28 @@
 		<link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
 	</head>
 	<body>
-		<div id="pausemenu" class="overlay">
+		<div id="pausemenu" class="overlay overlaybg">
 			<div class="overlaytext">
 				<p>collideoscope</p>
 				<div class="pausesubtext">
 					<p>space to jump</p>
 					<p>left/right arrow keys to roll</p>
-					<p>esc or p to pause/unpause</p>
+					<p>esc to pause/unpause</p>
+					<p>p to toggle practice mode</p>
 				</div>
 			</div>
 		</div>
-		<div id="losemenu" class="overlay">
+		<div id="losemenu" class="overlay overlaybg">
 			<div class="overlaytext">
 				<p>you lost :(</p>
 				<p>you made it <span id="scoreboard"></span> meters</p>
-				<p>press enter to try again</p>
+				<p class="pausesubtext">press enter to try again</p>
+				<p class="pausesubtext">p to toggle practice mode</p>
+			</div>
+		</div>
+		<div id="practicemode">
+			<div class="practicetext overlaybg">
+				practice mode
 			</div>
 		</div>
 		<script>const IS_KALEIDOSCOPE_SIM = false;</script>

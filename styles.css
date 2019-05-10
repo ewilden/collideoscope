@@ -23,9 +23,13 @@
     height: 100%;
     padding-top: 30px;
     color: #FFFFFF;
-    background-color: rgba(0, 0, 0, 0.6);
     z-index: 3;
 }
+
+.overlaybg {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
 #losemenu {
     padding-top: 60px;
     display: none;
@@ -33,4 +37,21 @@
 
 #losemenu.ispaused {
     display: block;
+}
+
+#practicemode {
+    display: none;
+}
+#practicemode.ispractice {
+    display: block;
+}
+
+.practicetext {
+    padding: 10px;
+    position: absolute;
+    right: 56px;
+    bottom: 56px;
+    color: #FFFFFF;
+    z-index: 2;
+    font-size: 48px;
 }

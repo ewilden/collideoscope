@@ -5,6 +5,7 @@ let WorldZRotation = 0;
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
 let inLosingState = false;
+let inPracticeMode = false;
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -143,7 +144,7 @@ const pauseOrUnpause = event => {
 const losemenu = document.getElementById("losemenu");
 const scoreboard = document.getElementById("scoreboard");
 function youLose() {
-    if (inLosingState) {
+    if (inLosingState || inPracticeMode) {
         return;
     }
     inLosingState = true;
@@ -162,9 +163,19 @@ addKeyAction(
     pauseOrUnpause,
     event => { },
 );
+
+const practicemodetext = document.getElementById("practicemode");
 addKeyAction(
     KeyP,
-    pauseOrUnpause,
+    event => {
+        if (inPracticeMode) {
+            practicemodetext.classList.remove("ispractice");
+            inPracticeMode = false;
+        } else {
+            inPracticeMode = true;
+            practicemodetext.classList.add("ispractice");
+        }
+    },
     event => { },
 );
 addKeyAction(
