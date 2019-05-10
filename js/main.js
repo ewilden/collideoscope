@@ -251,13 +251,13 @@ let zWhenStartedLife = zDisplacement;
 let zDispAtPrevBarrierAddition = 0;
 const ROTATION_SPEED = 0.01;
 const MIN_Z_SPEED = 0.07;
-const MAX_Z_SPEED = 0.15;
+const MAX_Z_SPEED = 0.14;
 let currentSpeed = MIN_Z_SPEED;
 
 function increaseDifficulty() {
     //console.log(currentSpeed)
     if (currentSpeed < MAX_Z_SPEED) {
-        currentSpeed += 0.00006;
+        currentSpeed += 0.00003;
     }
 }
 
