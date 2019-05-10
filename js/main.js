@@ -4,6 +4,8 @@ camera.position.z = 8;
 let WorldZRotation = 0;
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
+let inLosingState = false;
+
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -95,6 +97,7 @@ const KeyW = { key: "w", keyCode: 87, isPressed: false };
 const KeyS = { key: "s", keyCode: 83, isPressed: false };
 const Space = { key: "Space", keyCode: 32, isPressed: false };
 const KeyP = { key: "p", keyCode: 80, isPressed: false };
+const Enter = { key: "Enter", keyCode: 13, isPressed: false };
 const boundKeys = [
     ArrowLeft,
     ArrowRight,
@@ -133,6 +136,17 @@ const pauseOrUnpause = event => {
     }
 };
 
+const losemenu = document.getElementById("losemenu");
+function youLose() {
+    inLosingState = true;
+    losemenu.classList.add("ispaused");
+    currentSpeed = MIN_Z_SPEED;
+}
+function restartAfterLoss() {
+    losemenu.classList.remove('ispaused');
+    inLosingState = false;
+}
+
 addKeyAction(
     Escape,
     pauseOrUnpause,
@@ -153,6 +167,13 @@ addKeyAction(
     },
     event => { },
 );
+addKeyAction(
+    Enter,
+    event => {
+        restartAfterLoss()
+    },
+    event => { },
+)
 
 pauseOrUnpause();
 renderer.render(scene, camera);
@@ -207,31 +228,35 @@ function mainAnimationLoop() {
 
     // update rotation and depth velocity
     let rotZ = 0;
-    if (ArrowRight.isPressed) {
-        rotZ += -ROTATION_SPEED;
-        rotating = true;
-        clockwise = true;
-    }
-    if (ArrowLeft.isPressed) {
-        rotZ += ROTATION_SPEED;
-        rotating = true;
-        clockwise = false;
-    }
+    if (inLosingState) {
+        currentSpeed = MIN_Z_SPEED;
+    } else {
+        if (ArrowRight.isPressed) {
+            rotZ += -ROTATION_SPEED;
+            rotating = true;
+            clockwise = true;
+        }
+        if (ArrowLeft.isPressed) {
+            rotZ += ROTATION_SPEED;
+            rotating = true;
+            clockwise = false;
+        }
 
-    if (Space.isPressed) {
-        jumped = true;
-    }
+        if (Space.isPressed) {
+            jumped = true;
+        }
 
-    if (Space.isPressed) {
-        jumped = true;
-    }
+        if (Space.isPressed) {
+            jumped = true;
+        }
 
-    if (Space.isPressed) {
-        jumped = true;
-    }
+        if (Space.isPressed) {
+            jumped = true;
+        }
 
-    if (isPaused) {
-        return;
+        if (isPaused) {
+            return;
+        }
     }
 
     // move the camera, lights, and player

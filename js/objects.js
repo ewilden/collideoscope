@@ -134,16 +134,21 @@ function NewPieBarrier(
                     barrierCenter.z)
             );
         }
+        let hasIntersected = false;
         // for debugging
         edgePointsToTest.forEach(point => {
+            if (hasIntersected) {
+                return;
+            }
             const rayToPoint = new THREE.Vector3().subVectors(point, barrierCenter).normalize();
             const raycaster = new THREE.Raycaster(barrierCenter, rayToPoint, 0, CYLINDER_RADIUS);
             const intersections = raycaster.intersectObject(player);
             if (intersections.length > 0) {
+                hasIntersected = true;
+                youLose();
                 // make sure new color is noticeably different from old one
                 const randColor = Math.floor(Math.random() * (0xaaaaaa) + 0x200000);
                 player.material.color.setHex((randColor + player.material.color.getHex()) % 0xffffff);
-		currentSpeed = MIN_Z_SPEED;
             }
         });
     }
@@ -167,16 +172,16 @@ function NewRandomPieBarrier(startingZ = 0) {
     let numSlices;
     let r = Math.random();
     for (var i = 0; i < sliceProbabilities.length; i++) {
-	if (r < sliceProbabilities[i]) {
-	    numSlices = (i * 2) + 2;
+        if (r < sliceProbabilities[i]) {
+            numSlices = (i * 2) + 2;
 
-	    if (numSlices == 10 && prevSlices == 10) {
-		r = Math.random();
-		i = 0;
-	    } else {
-		break;
-	    }
-	}
+            if (numSlices == 10 && prevSlices == 10) {
+                r = Math.random();
+                i = 0;
+            } else {
+                break;
+            }
+        }
     }
 
 

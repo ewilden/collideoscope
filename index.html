@@ -10,14 +10,20 @@
 		<link rel="stylesheet" type="text/css" href="styles.css" media="screen" />
 	</head>
 	<body>
-		<div id="pausemenu">
-			<div class="pausetext">
+		<div id="pausemenu" class="overlay">
+			<div class="overlaytext">
 				<p>collideoscope</p>
 				<div class="pausesubtext">
 					<p>space to jump</p>
 					<p>left/right arrow keys to roll</p>
 					<p>esc or p to pause/unpause</p>
 				</div>
+			</div>
+		</div>
+		<div id="losemenu" class="overlay">
+			<div class="overlaytext">
+				<p>you lost :(</p>
+				<p>press enter to try again</p>
 			</div>
 		</div>
 		<script>const IS_KALEIDOSCOPE_SIM = false;</script>
