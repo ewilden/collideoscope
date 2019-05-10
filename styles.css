@@ -54,5 +54,22 @@
     bottom: 4vh;
     color: #FFFFFF;
     z-index: 2;
-    font-size: 3.5vw;
+    font-size: 2.5vw;
+    text-align: right;
+}
+
+#speedmenu {
+    display: none;
+    position: absolute;
+    left: 4vw;
+    bottom: 4vh;
+    color: #FFFFFF;
+    z-index: 2;
+    text-align: center;
+    font-size: 2.5vw;
+    padding-bottom: 10px;
+}
+
+#speedmenu.ispractice {
+    display: block;
 }
