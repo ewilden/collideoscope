@@ -12,6 +12,7 @@ window.addEventListener('resize', event => {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 8;
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.render(scene, camera);
 });
 
 let CYLINDER_PARITY = false;
@@ -23,14 +24,14 @@ const enclosingCylinders = [
     NewPieCylinder(-CYLINDER_HEIGHT, true),
 ];
 
-const endcap = NewCylinderEndcap();
-endcap.position.z = -CYLINDER_HEIGHT;
-//scene.add(endcap);
+// const endcap = NewCylinderEndcap();
+// endcap.position.z = -CYLINDER_HEIGHT;
+// scene.add(endcap);
 
 const barriers = [];
 
-const NUM_STARTING_BARRIERS = 10;
-const BARRIER_STARTING_Z = 4;
+const NUM_STARTING_BARRIERS = 16;
+const BARRIER_STARTING_Z = 0;
 const BARRIER_Z_INCREMENT = 8;
 for (let i = 0; i < NUM_STARTING_BARRIERS; ++i) {
     barriers.push(NewRandomPieBarrier(BARRIER_STARTING_Z - i * BARRIER_Z_INCREMENT));
@@ -196,8 +197,8 @@ let currentSpeed = MIN_Z_SPEED;
 function increaseDifficulty() {
     //console.log(currentSpeed)
     if (currentSpeed < MAX_Z_SPEED) {
-	currentSpeed += 0.00006;
-    } 
+        currentSpeed += 0.00006;
+    }
 }
 
 // animate/render loop
