@@ -124,6 +124,10 @@ function watchKey(keyObj) {
 
 boundKeys.forEach(watchKey);
 const pauseOrUnpause = event => {
+    if (inLosingState) {
+        return;
+    }
+
     if (!isPaused) {
         // becoming paused
         pausemenu.classList.add("ispaused");
