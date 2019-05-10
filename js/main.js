@@ -141,12 +141,18 @@ const pauseOrUnpause = event => {
 };
 
 const losemenu = document.getElementById("losemenu");
+const scoreboard = document.getElementById("scoreboard");
 function youLose() {
+    if (inLosingState) {
+        return;
+    }
     inLosingState = true;
+    scoreboard.textContent = `${Math.round(zDisplacement - zWhenStartedLife)}`;
     losemenu.classList.add("ispaused");
     currentSpeed = MIN_Z_SPEED;
 }
 function restartAfterLoss() {
+    zWhenStartedLife = zDisplacement;
     losemenu.classList.remove('ispaused');
     inLosingState = false;
 }
@@ -212,6 +218,7 @@ document.addEventListener('keyup', (event) => {
 
 let zDisplacement = 0;
 let prevZDisplacement = 0;
+let zWhenStartedLife = zDisplacement;
 
 let zDispAtPrevBarrierAddition = 0;
 const ROTATION_SPEED = 0.01;
