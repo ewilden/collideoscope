@@ -187,7 +187,7 @@ let zDisplacement = 0;
 let prevZDisplacement = 0;
 
 let zDispAtPrevBarrierAddition = 0;
-const Z_SPEED = 0.00;
+const Z_SPEED = 0.08;
 const ROTATION_SPEED = 0.006;
 
 // animate/render loop
