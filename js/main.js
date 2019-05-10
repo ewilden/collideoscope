@@ -187,7 +187,7 @@ let zDisplacement = 0;
 let prevZDisplacement = 0;
 
 let zDispAtPrevBarrierAddition = 0;
-const Z_SPEED = 0.08;
+const Z_SPEED = 0.00;
 const ROTATION_SPEED = 0.006;
 
 // animate/render loop
@@ -195,7 +195,7 @@ function mainAnimationLoop() {
     requestAnimationFrame(mainAnimationLoop);
 
     // update rotation and depth velocity
-    let velZ = 0;
+    let velZ = 0.08;
     let rotZ = 0;
     if (ArrowUp.isPressed) {
         velZ += Z_SPEED;
