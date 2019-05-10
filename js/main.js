@@ -86,6 +86,7 @@ const KeyA = { key: "a", keyCode: 65, isPressed: false };
 const KeyD = { key: "d", keyCode: 68, isPressed: false };
 const KeyW = { key: "w", keyCode: 87, isPressed: false };
 const KeyS = { key: "s", keyCode: 83, isPressed: false };
+const Space = { key: "Space", keyCode: 32, isPressed: false }
 const boundKeys = [
     ArrowLeft,
     ArrowRight,
@@ -94,7 +95,8 @@ const boundKeys = [
     KeyA,
     KeyD,
     KeyW,
-    KeyS
+    KeyS,
+    Space
 ];
 
 const Escape = { key: "Escape", keyCode: 27, isPressed: false };
@@ -144,7 +146,7 @@ document.addEventListener('keyup', (event) => {
 let zDisplacement = 0;
 let prevZDisplacement = 0;
 
-const Z_SPEED = 0.05;
+const Z_SPEED = 0.07;
 const ROTATION_SPEED = 0.05;
 
 // animate/render loop
@@ -162,31 +164,46 @@ function mainAnimationLoop() {
     }
     if (ArrowRight.isPressed) {
         rotZ += -ROTATION_SPEED;
+        rotating = true;
+        clockwise = true;
     }
     if (ArrowLeft.isPressed) {
         rotZ += ROTATION_SPEED;
+        rotating = true;
+        clockwise = false;
     }
 
-    // update from WASD movement
-    let velX = 0;
-    let velY = 0;
-    if (KeyA.isPressed) {
-        velX -= 0.05;
+    if (Space.isPressed) {
+        jumped = true;
     }
-    if (KeyD.isPressed) {
-        velX += 0.05;
+
+    if (Space.isPressed) {
+        jumped = true;
     }
-    if (KeyW.isPressed) {
-        velY += 0.05;
-    }
-    if (KeyS.isPressed) {
-        velY -= 0.05;
+
+    if (Space.isPressed) {
+        jumped = true;
     }
 
     if (isPaused) {
         renderer.render(scene, camera);
         return;
     }
+    // update from WASD movement
+    let velX = 0;
+    let velY = 0;
+    // if (KeyA.isPressed) {
+    //     velX -= 0.05;
+    // }
+    // if (KeyD.isPressed) {
+    //     velX += 0.05;
+    // }
+    // if (KeyW.isPressed) {
+    //     velY += 0.05;
+    // }
+    // if (KeyS.isPressed) {
+    //     velY -= 0.05;
+    // }
 
     // move the camera, lights, and player
     WorldZRotation += rotZ;
@@ -227,12 +244,6 @@ function mainAnimationLoop() {
         newCylinder.rotateOnWorldAxis(Z_AXIS, WorldZRotation);
     }
 
-    // force player to stay within bounds of cylinder
-    let playerXY = player.position.clone().setZ(0);
-    playerXY.setLength(Math.min(CYLINDER_RADIUS - PLAYER_RADIUS, playerXY.length()));
-    player.position.x = playerXY.x;
-    player.position.y = playerXY.y;
-
     // reposition camera based on player
     playerXY = player.position.clone().setZ(0);
     const cameraXY = camera.position.clone().setZ(0);
@@ -245,8 +256,20 @@ function mainAnimationLoop() {
     camera.position.lerp(new THREE.Vector3(0, 0, camera.position.z), 0.1);
     camera.position.z = CAMERA_DISTANCE_FROM_PLAYER + player.position.z;
 
+    simulatePhysics();
+
+    // check collisions
+    for (let i = 0; i < barriers.length; ++i) {
+        const currBarrier = barriers[i];
+        if (currBarrier.position.z < player.position.z - 4) {
+            break;
+        }
+        currBarrier.checkCollision(player);
+    }
+
     renderer.render(scene, camera);
     animate();
+
     SingletonKaleidoscopeTexture.needsUpdate = true;
     prevZDisplacement = zDisplacement;
 }
