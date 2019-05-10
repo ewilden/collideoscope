@@ -218,9 +218,6 @@ function mainAnimationLoop() {
 
     if (zDisplacement >= BARRIER_STARTING_Z + BARRIER_Z_INCREMENT && (zDisplacement % BARRIER_Z_INCREMENT < 0.8) && (prevZDisplacement % BARRIER_Z_INCREMENT > BARRIER_Z_INCREMENT - 0.8)) {
         if (barriers[0]) {
-            barriers[0].children.forEach(child => {
-                child.material.dispose();
-            });
             scene.remove(barriers[0]);
             barriers.shift();
         }

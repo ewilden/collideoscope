@@ -69,6 +69,7 @@ const KaleidoscopeMaterial = () => {
     });
     return mat;
 }
+const SingletonBarrierMaterial = KaleidoscopeMaterial();
 
 const EnclosingKaleidoscopeMaterial = () => {
     const mat = new THREE.MeshStandardMaterial({
@@ -86,48 +87,32 @@ const BARRIER_RADIUS = CYLINDER_RADIUS;
 
 const PieBarrierGeometry = new THREE.CylinderGeometry(BARRIER_RADIUS, BARRIER_RADIUS, 1, 32, 1, false, 0, SLICE_ANGLE);
 
-function NewPieBarrier(
-    numSlices, // how many 1/6-th slices are in the barrier
-    gapPosition, // the angle (in radians) that the centerline of the gap in the barrier should be at
+function NewPieSlice(
+    parity, // true or false
+    angle, // radians
 ) {
-    const slices = [];
-
-    for (let i = 0; i < numSlices; ++i) {
-        const geometry = PieBarrierGeometry;
-        const material = KaleidoscopeMaterial();
-        const cylinder = new THREE.Mesh(geometry, material);
-
-        // this is where the kaleidoscope effect comes in!
-        if (i % 2 == 0) {
-            cylinder.applyMatrix(REFLECTION_MATRIX);
-        }
-
-        cylinder.rotation.x += Math.PI / 2;
-        cylinder.rotation.y += SLICE_ANGLE * i;
-        slices.push(cylinder);
+    const worldZRotationWhenCreated = WorldZRotation;
+    const geometry = PieBarrierGeometry;
+    const material = SingletonBarrierMaterial;
+    const cylinder = new THREE.Mesh(geometry, material);
+    if (parity) {
+        cylinder.applyMatrix(REFLECTION_MATRIX);
     }
-    const group = new THREE.Group();
-    slices.forEach(slice => group.add(slice));
-    const gapFraction = 1 - numSlices / TOTAL_NUM_SLICES;
-    group.rotation.z += gapFraction * Math.PI + Math.PI / 2 + gapPosition;
-    group.WorldZRotationWhenCreated = WorldZRotation;
-
-    group.checkCollision = function (player) {
-        const barrierCenter = new THREE.Vector3(0, 0, group.position.z + 0.5);
-        const updatedGapPosition = gapPosition + WorldZRotation - group.WorldZRotationWhenCreated;
-        const gapWidth = (1 - (numSlices / TOTAL_NUM_SLICES)) * 2 * Math.PI;
-        const startingDeg = updatedGapPosition + gapWidth / 2;
-        const degIncr = SLICE_ANGLE / 2;
+    cylinder.rotation.x += Math.PI / 2;
+    cylinder.rotateOnWorldAxis(Z_AXIS, angle);
+    cylinder.checkSliceCollision = function (player) {
+        const barrierCenter = new THREE.Vector3(0, 0, cylinder.position.z + 0.5);
+        const angleIncr = SLICE_ANGLE / 2;
+        const startingAngle = angle - angleIncr + WorldZRotation - worldZRotationWhenCreated - Math.PI / 2; // get to our good old x-y plane unit circle
         const edgePointsToTest = [];
-        for (let i = 0; i < numSlices * 2 + 1; i++) {
-            const currDeg = startingDeg + i * degIncr;
+        for (let i = 0; i < 3; ++i) {
+            const currAngle = startingAngle + i * angleIncr;
             edgePointsToTest.push(
-                new THREE.Vector3(Math.cos(currDeg) * CYLINDER_RADIUS,
-                    Math.sin(currDeg) * CYLINDER_RADIUS,
+                new THREE.Vector3(Math.cos(currAngle) * CYLINDER_RADIUS,
+                    Math.sin(currAngle) * CYLINDER_RADIUS,
                     barrierCenter.z)
             );
         }
-        // for debugging
         edgePointsToTest.forEach(point => {
             const rayToPoint = new THREE.Vector3().subVectors(point, barrierCenter).normalize();
             const raycaster = new THREE.Raycaster(barrierCenter, rayToPoint, 0, CYLINDER_RADIUS);
@@ -139,6 +124,28 @@ function NewPieBarrier(
             }
         });
     }
+    return cylinder;
+}
+
+function NewPieBarrier(
+    numSlices, // how many 1/12-th slices are in the barrier
+    gapPosition, // the angle (in radians) that the centerline of the gap in the barrier should be at
+) {
+    const slices = [];
+
+    for (let i = 0; i < numSlices; ++i) {
+        const slice = NewPieSlice(i % 2, SLICE_ANGLE * i);
+        slices.push(slice);
+    }
+    const group = new THREE.Group();
+    slices.forEach(slice => group.add(slice));
+
+    group.checkCollision = function (player) {
+        slices.forEach(slice => slice.checkSliceCollision(player));
+    }
+
+    const gapFraction = 1 - numSlices / TOTAL_NUM_SLICES;
+    group.rotation.z += gapFraction * Math.PI + Math.PI / 2 + gapPosition;
     return group;
 }
 
