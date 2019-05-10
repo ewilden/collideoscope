@@ -8,6 +8,12 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+window.addEventListener('resize', event => {
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 8;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
 let CYLINDER_PARITY = false;
 const NUM_STARTING_CYLINDERS = 2;
 
