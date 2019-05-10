@@ -1,6 +1,8 @@
-const GRAVITY = new THREE.Vector3(0, -.0046, 0);
+const GRAVITY = new THREE.Vector3(0, -.0030, 0);
 var velocity = new THREE.Vector3();
 var netForces = new THREE.Vector3();
+
+var currTouchingCylinder = false;
 
 function collideWithCylinder() {
     let playerXY = player.position.clone().setZ(0);
@@ -16,23 +18,23 @@ function touchingCylinder() {
 var jumped = false;
 function handleJump() {
     jumped = false;
-    if (touchingCylinder()) {
+    if (currTouchingCylinder) {
         velocity = new THREE.Vector3();
         let jumpForce = player.position.clone().negate().setLength(CYLINDER_RADIUS - PLAYER_RADIUS);
-        jumpForce.divideScalar(.95);
+        jumpForce.divideScalar(.89);
         netForces.copy(jumpForce);
     }
 }
 
-function tangentToCylinder(clockwise) {
+function tangentToCylinder(neg) {
     let tangent = player.position.clone().setZ(0);
 
     let angle;
-    if (clockwise) {
-        angle = Math.PI / 2;
+    if (!neg) {
+        angle = -Math.PI / 2;
     }
     else {
-        angle = -Math.PI / 2;
+        angle = Math.PI / 2;
     }
 
     tangent.applyAxisAngle(Z_AXIS, angle);
@@ -42,28 +44,43 @@ function tangentToCylinder(clockwise) {
 var rotating = false;
 var clockwise = false;
 function rotateBallWithCylinder() {
-    if (!rotating || !touchingCylinder()) return;
+    if (!rotating || !currTouchingCylinder) return;
 
     let tan = tangentToCylinder(clockwise);
-    tan.divideScalar(70);
+    tan.multiplyScalar(.0045);
     netForces.add(tan);
 
     rotating = false;
 }
 
-function addNormal() {
-    if (!touchingCylinder()) return;
+function addFriction() {
+    if (!currTouchingCylinder) return;
 
-    let tangent = player.position.clone().setZ(0);
-    if (tangent.x < 0) tangent.x *= -1;
-    tangent.applyAxisAngle(Z_AXIS, Math.PI / 2);
+    let tangent = player.position.clone().setZ(0).normalize();
+    if (tangent.x < 0) 
+	tangent.applyAxisAngle(Z_AXIS, -Math.PI / 2);
+    else 
+	tangent.applyAxisAngle(Z_AXIS, Math.PI / 2);
 
     let X_AXIS = new THREE.Vector3(1, 0, 0);
+    let sin_factor = new THREE.Vector3().crossVectors(X_AXIS, tangent).length() / tangent.length();
 
-    let cos_factor = (tangent.dot(X_AXIS)) / tangent.length();
-    let normal = new THREE.Vector3().copy(GRAVITY)
-        .negate().multiplyScalar(cos_factor);
-    netForces.add(normal);
+    tangent.multiplyScalar(sin_factor);
+    tangent.multiplyScalar(.005);
+    
+    netForces.sub(tangent);
+}
+
+function checkRadialVelocity() {
+    if (!currTouchingCylinder) return;
+
+    let radVec = player.position.clone().setZ(0).normalize();
+    let dotprod = velocity.dot(radVec);
+    if (dotprod > 0) {
+	let proj = radVec.multiplyScalar(dotprod);
+	proj.multiplyScalar(0.2);
+	velocity.sub(proj);
+    }
 }
 
 function addGravity() {
@@ -80,13 +97,15 @@ function updateBallPosition() {
 }
 
 function simulateForces() {
+    currTouchingCylinder = touchingCylinder();
     netForces = new THREE.Vector3();
     if (jumped) {
         handleJump();
     }
     rotateBallWithCylinder();
     addGravity();
-    addNormal();
+    addFriction();
+    checkRadialVelocity();
     updateBallVelocity();
     updateBallPosition();
 }

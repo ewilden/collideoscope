@@ -31,7 +31,7 @@ const barriers = [];
 
 const NUM_STARTING_BARRIERS = 10;
 const BARRIER_STARTING_Z = 4;
-const BARRIER_Z_INCREMENT = 4;
+const BARRIER_Z_INCREMENT = 8;
 for (let i = 0; i < NUM_STARTING_BARRIERS; ++i) {
     barriers.push(NewRandomPieBarrier(BARRIER_STARTING_Z - i * BARRIER_Z_INCREMENT));
 }
@@ -117,6 +117,7 @@ function watchKey(keyObj) {
         event => { keyObj.isPressed = false },
     );
 }
+
 boundKeys.forEach(watchKey);
 const pauseOrUnpause = event => {
     if (!isPaused) {
@@ -187,16 +188,15 @@ let zDisplacement = 0;
 let prevZDisplacement = 0;
 
 let zDispAtPrevBarrierAddition = 0;
-
-const Z_SPEED = 0.07;
-const ROTATION_SPEED = 0.05;
+const Z_SPEED = 0.08;
+const ROTATION_SPEED = 0.006;
 
 // animate/render loop
 function mainAnimationLoop() {
     requestAnimationFrame(mainAnimationLoop);
 
     // update rotation and depth velocity
-    let velZ = 0;
+    let velZ = 0.08;
     let rotZ = 0;
     if (ArrowUp.isPressed) {
         velZ += Z_SPEED;
