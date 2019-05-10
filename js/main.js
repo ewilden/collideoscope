@@ -250,13 +250,12 @@ let zWhenStartedLife = zDisplacement;
 
 let zDispAtPrevBarrierAddition = 0;
 const ROTATION_SPEED = 0.01;
-const MIN_Z_SPEED = 0.07;
-const MAX_Z_SPEED = 0.15;
+const MIN_Z_SPEED = 0.0675;
+const MAX_Z_SPEED = 0.1494;
 let currentSpeed = MIN_Z_SPEED;
 
 function increaseDifficulty() {
-    //console.log(currentSpeed)
-    if (currentSpeed < MAX_Z_SPEED) {
+    if (!inPracticeMode && currentSpeed < MAX_Z_SPEED) {
         currentSpeed += 0.00006;
     }
 }
@@ -287,10 +286,10 @@ function mainAnimationLoop() {
 
         if (inPracticeMode) {
             if (ArrowUp.isPressed) {
-                currentSpeed = Math.min(MAX_Z_SPEED, currentSpeed + 0.005);
+                currentSpeed = Math.min(MAX_Z_SPEED, currentSpeed + 0.001);
             }
             if (ArrowDown.isPressed) {
-                currentSpeed = Math.max(MIN_Z_SPEED, currentSpeed - 0.005);
+                currentSpeed = Math.max(0, currentSpeed - 0.001);
             }
             currspeednode.textContent = `${Math.floor(currentSpeed * 600 * 2.23694) / 10}`;
         }
