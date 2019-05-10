@@ -183,6 +183,7 @@ function NewRandomPieBarrier(startingZ = 0) {
             }
         }
     }
+    prevSlices = numSlices;
 
 
     let rotationAngle;
