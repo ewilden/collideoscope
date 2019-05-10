@@ -1,5 +1,21 @@
 #pausemenu {
     display: none;
+}
+
+#pausemenu.ispaused {
+    display: block;
+}
+
+.overlaytext {
+    text-align: center;
+    font-size: 80px;
+}
+
+.pausesubtext {
+    font-size: 48px;
+}
+
+.overlay {
     position: absolute;
     left: 0;
     top: 0;
@@ -7,19 +23,35 @@
     height: 100%;
     padding-top: 30px;
     color: #FFFFFF;
-    background-color: rgba(0, 0, 0, 0.6);
     z-index: 3;
 }
 
-#pausemenu.ispaused {
+.overlaybg {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+#losemenu {
+    padding-top: 60px;
+    display: none;
+}
+
+#losemenu.ispaused {
     display: block;
 }
 
-.pausetext {
-    text-align: center;
-    font-size: 80px;
+#practicemode {
+    display: none;
+}
+#practicemode.ispractice {
+    display: block;
 }
 
-.pausesubtext {
+.practicetext {
+    padding: 10px;
+    position: absolute;
+    right: 56px;
+    bottom: 56px;
+    color: #FFFFFF;
+    z-index: 2;
     font-size: 48px;
 }

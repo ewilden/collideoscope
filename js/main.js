@@ -4,6 +4,9 @@ camera.position.z = 8;
 let WorldZRotation = 0;
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
+let inLosingState = false;
+let inPracticeMode = false;
+
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
@@ -95,6 +98,7 @@ const KeyW = { key: "w", keyCode: 87, isPressed: false };
 const KeyS = { key: "s", keyCode: 83, isPressed: false };
 const Space = { key: "Space", keyCode: 32, isPressed: false };
 const KeyP = { key: "p", keyCode: 80, isPressed: false };
+const Enter = { key: "Enter", keyCode: 13, isPressed: false };
 const boundKeys = [
     ArrowLeft,
     ArrowRight,
@@ -121,6 +125,10 @@ function watchKey(keyObj) {
 
 boundKeys.forEach(watchKey);
 const pauseOrUnpause = event => {
+    if (inLosingState) {
+        return;
+    }
+
     if (!isPaused) {
         // becoming paused
         pausemenu.classList.add("ispaused");
@@ -133,14 +141,41 @@ const pauseOrUnpause = event => {
     }
 };
 
+const losemenu = document.getElementById("losemenu");
+const scoreboard = document.getElementById("scoreboard");
+function youLose() {
+    if (inLosingState || inPracticeMode) {
+        return;
+    }
+    inLosingState = true;
+    scoreboard.textContent = `${Math.round(zDisplacement - zWhenStartedLife)}`;
+    losemenu.classList.add("ispaused");
+    currentSpeed = MIN_Z_SPEED;
+}
+function restartAfterLoss() {
+    zWhenStartedLife = zDisplacement;
+    losemenu.classList.remove('ispaused');
+    inLosingState = false;
+}
+
 addKeyAction(
     Escape,
     pauseOrUnpause,
     event => { },
 );
+
+const practicemodetext = document.getElementById("practicemode");
 addKeyAction(
     KeyP,
-    pauseOrUnpause,
+    event => {
+        if (inPracticeMode) {
+            practicemodetext.classList.remove("ispractice");
+            inPracticeMode = false;
+        } else {
+            inPracticeMode = true;
+            practicemodetext.classList.add("ispractice");
+        }
+    },
     event => { },
 );
 addKeyAction(
@@ -153,6 +188,13 @@ addKeyAction(
     },
     event => { },
 );
+addKeyAction(
+    Enter,
+    event => {
+        restartAfterLoss()
+    },
+    event => { },
+)
 
 pauseOrUnpause();
 renderer.render(scene, camera);
@@ -187,6 +229,7 @@ document.addEventListener('keyup', (event) => {
 
 let zDisplacement = 0;
 let prevZDisplacement = 0;
+let zWhenStartedLife = zDisplacement;
 
 let zDispAtPrevBarrierAddition = 0;
 const ROTATION_SPEED = 0.01;
@@ -207,31 +250,35 @@ function mainAnimationLoop() {
 
     // update rotation and depth velocity
     let rotZ = 0;
-    if (ArrowRight.isPressed) {
-        rotZ += -ROTATION_SPEED;
-        rotating = true;
-        clockwise = true;
-    }
-    if (ArrowLeft.isPressed) {
-        rotZ += ROTATION_SPEED;
-        rotating = true;
-        clockwise = false;
-    }
+    if (inLosingState) {
+        currentSpeed = MIN_Z_SPEED;
+    } else {
+        if (ArrowRight.isPressed) {
+            rotZ += -ROTATION_SPEED;
+            rotating = true;
+            clockwise = true;
+        }
+        if (ArrowLeft.isPressed) {
+            rotZ += ROTATION_SPEED;
+            rotating = true;
+            clockwise = false;
+        }
 
-    if (Space.isPressed) {
-        jumped = true;
-    }
+        if (Space.isPressed) {
+            jumped = true;
+        }
 
-    if (Space.isPressed) {
-        jumped = true;
-    }
+        if (Space.isPressed) {
+            jumped = true;
+        }
 
-    if (Space.isPressed) {
-        jumped = true;
-    }
+        if (Space.isPressed) {
+            jumped = true;
+        }
 
-    if (isPaused) {
-        return;
+        if (isPaused) {
+            return;
+        }
     }
 
     // move the camera, lights, and player
