@@ -2,6 +2,8 @@ const GRAVITY = new THREE.Vector3(0, -.0030, 0);
 var velocity = new THREE.Vector3();
 var netForces = new THREE.Vector3();
 
+var currTouchingCylinder = false;
+
 function collideWithCylinder() {
     let playerXY = player.position.clone().setZ(0);
     playerXY.setLength(Math.min(CYLINDER_RADIUS - PLAYER_RADIUS, playerXY.length()));
@@ -16,7 +18,7 @@ function touchingCylinder() {
 var jumped = false;
 function handleJump() {
     jumped = false;
-    if (touchingCylinder()) {
+    if (currTouchingCylinder) {
         velocity = new THREE.Vector3();
         let jumpForce = player.position.clone().negate().setLength(CYLINDER_RADIUS - PLAYER_RADIUS);
         jumpForce.divideScalar(.89);
@@ -42,7 +44,7 @@ function tangentToCylinder(neg) {
 var rotating = false;
 var clockwise = false;
 function rotateBallWithCylinder() {
-    if (!rotating || !touchingCylinder()) return;
+    if (!rotating || !currTouchingCylinder) return;
 
     let tan = tangentToCylinder(clockwise);
     tan.multiplyScalar(.0045);
@@ -52,7 +54,7 @@ function rotateBallWithCylinder() {
 }
 
 function addFriction() {
-    if (!touchingCylinder()) return;
+    if (!currTouchingCylinder) return;
 
     let tangent = player.position.clone().setZ(0).normalize();
     if (tangent.x < 0) 
@@ -70,7 +72,7 @@ function addFriction() {
 }
 
 function checkRadialVelocity() {
-    if (!touchingCylinder()) return;
+    if (!currTouchingCylinder) return;
 
     let radVec = player.position.clone().setZ(0).normalize();
     let dotprod = velocity.dot(radVec);
@@ -95,6 +97,7 @@ function updateBallPosition() {
 }
 
 function simulateForces() {
+    currTouchingCylinder = touchingCylinder();
     netForces = new THREE.Vector3();
     if (jumped) {
         handleJump();

@@ -117,6 +117,7 @@ function watchKey(keyObj) {
         event => { keyObj.isPressed = false },
     );
 }
+
 boundKeys.forEach(watchKey);
 const pauseOrUnpause = event => {
     if (!isPaused) {
