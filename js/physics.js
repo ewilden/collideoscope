@@ -1,4 +1,4 @@
-const GRAVITY = new THREE.Vector3(0, -.0030, 0);
+const GRAVITY = new THREE.Vector3(0, -.0025, 0);
 var velocity = new THREE.Vector3();
 var netForces = new THREE.Vector3();
 
@@ -21,7 +21,7 @@ function handleJump() {
     if (currTouchingCylinder) {
         velocity = new THREE.Vector3();
         let jumpForce = player.position.clone().negate().setLength(CYLINDER_RADIUS - PLAYER_RADIUS);
-        jumpForce.divideScalar(.89);
+        jumpForce.multiplyScalar(1.2);
         netForces.copy(jumpForce);
     }
 }
@@ -78,7 +78,7 @@ function checkRadialVelocity() {
     let dotprod = velocity.dot(radVec);
     if (dotprod > 0) {
 	let proj = radVec.multiplyScalar(dotprod);
-	proj.multiplyScalar(0.2);
+	proj.multiplyScalar(.2);
 	velocity.sub(proj);
     }
 }
