@@ -1,4 +1,4 @@
-const GRAVITY = new THREE.Vector3(0, -.0025, 0);
+const GRAVITY = new THREE.Vector3(0, -.0035, 0);
 var velocity = new THREE.Vector3();
 var netForces = new THREE.Vector3();
 
