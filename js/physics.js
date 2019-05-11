@@ -18,11 +18,11 @@ function touchingCylinder() {
 var jumped = false;
 function handleJump() {
     jumped = false;
-    if (currTouchingCylinder) {
-        velocity = new THREE.Vector3();
+    if (currTouchingCylinder && player.position.y < 0) {
+	velocity = new THREE.Vector3();
         let jumpForce = player.position.clone().negate().setLength(CYLINDER_RADIUS - PLAYER_RADIUS);
-        jumpForce.multiplyScalar(1.2);
-        netForces.copy(jumpForce);
+	jumpForce.multiplyScalar(1.2)
+        netForces.add(jumpForce);
     }
 }
 

@@ -177,9 +177,6 @@ const practicemodetext = document.getElementById("practicemode");
 addKeyAction(
     KeyP,
     event => {
-        if (inLosingState) {
-            return;
-        }
         if (inPracticeMode) {
             practicemodetext.classList.remove("ispractice");
             speedmenu.classList.remove("ispractice");
