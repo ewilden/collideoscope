@@ -1,18 +1,23 @@
 let canvas;
+const CANVAS_SIZE = 512;
 if (IS_KALEIDOSCOPE_SIM) {
     canvas = document.getElementById('canvas');
 } else {
-    canvas = document.createElement('canvas');
+    if (typeof OffscreenCanvas === 'function') {
+        canvas = new OffscreenCanvas(CANVAS_SIZE, CANVAS_SIZE);
+    } else {
+        canvas = document.createElement('canvas');
+    }
 }
 
-canvas.width = 1024;
-canvas.height = 1024;
+canvas.width = CANVAS_SIZE;
+canvas.height = CANVAS_SIZE;
 const textureCanvas = canvas;
 const ctx = canvas.getContext('2d');
 ctx.fillStyle = "#111";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-const NUM_SHAPES = 120;
+const NUM_SHAPES = CANVAS_SIZE / 8;
 
 var colors = [
     "blue",
@@ -59,9 +64,9 @@ Point.prototype.midpointTo = function (otherPoint) {
 }
 
 Point.prototype.offCanvas = function () {
-    return this.loc.x <= 0 || this.loc.y <= 0 || 
-	this.loc.x >= canvas.width-1 || 
-	this.loc.y >= canvas.width-1;
+    return this.loc.x <= 0 || this.loc.y <= 0 ||
+        this.loc.x >= canvas.width - 1 ||
+        this.loc.y >= canvas.width - 1;
 }
 
 // Point.prototype.wrapPosition = function() {
@@ -102,20 +107,20 @@ Triangle.prototype.step = function () {
     this.p3.step(this.dir);
 }
 
-Triangle.prototype.handleBorder = function() {
+Triangle.prototype.handleBorder = function () {
     if (this.p1.offCanvas() && this.p2.offCanvas() && this.p3.offCanvas()) {
-	this.dir.negate();
+        this.dir.negate();
     }
 }
 
-Triangle.prototype.evolveColor = function() {
+Triangle.prototype.evolveColor = function () {
     if (this.transitionStep == this.totalSteps) {
-	this.targetColor = getRandomColor();
-	this.transitionStep = 0;
-	this.delta_r = (this.targetColor.r - this.color.r)/this.totalSteps;
-	this.delta_g = (this.targetColor.g - this.color.g)/this.totalSteps;
-	this.delta_b = (this.targetColor.b - this.color.b)/this.totalSteps;
-    } 
+        this.targetColor = getRandomColor();
+        this.transitionStep = 0;
+        this.delta_r = (this.targetColor.r - this.color.r) / this.totalSteps;
+        this.delta_g = (this.targetColor.g - this.color.g) / this.totalSteps;
+        this.delta_b = (this.targetColor.b - this.color.b) / this.totalSteps;
+    }
 
     this.color.r += this.delta_r;
     this.color.g += this.delta_g;
@@ -166,19 +171,19 @@ BezierShape.prototype.step = function () {
     this.ctrl4.step(this.dir);
 }
 
-BezierShape.prototype.handleBorder = function() {
-    if (this.p1.offCanvas() && this.p2.offCanvas()) 
-	this.dir.negate();
+BezierShape.prototype.handleBorder = function () {
+    if (this.p1.offCanvas() && this.p2.offCanvas())
+        this.dir.negate();
 }
 
-BezierShape.prototype.evolveColor = function() {
+BezierShape.prototype.evolveColor = function () {
     if (this.transitionStep == this.totalSteps) {
-	this.targetColor = getRandomColor();
-	this.transitionStep = 0;
-	this.delta_r = (this.targetColor.r - this.color.r)/this.totalSteps;
-	this.delta_g = (this.targetColor.g - this.color.g)/this.totalSteps;
-	this.delta_b = (this.targetColor.b - this.color.b)/this.totalSteps;
-    } 
+        this.targetColor = getRandomColor();
+        this.transitionStep = 0;
+        this.delta_r = (this.targetColor.r - this.color.r) / this.totalSteps;
+        this.delta_g = (this.targetColor.g - this.color.g) / this.totalSteps;
+        this.delta_b = (this.targetColor.b - this.color.b) / this.totalSteps;
+    }
 
     this.color.r += this.delta_r;
     this.color.g += this.delta_g;
@@ -190,8 +195,8 @@ BezierShape.prototype.evolveColor = function() {
 
 // https://stackoverflow.com/questions/1484506/random-color-generator
 function getRandomColor() {
-    if (Math.random() < .6) 
-	return new THREE.Color(colors[currentLevel % colors.length]);
+    if (Math.random() < .6)
+        return new THREE.Color(colors[currentLevel % colors.length]);
     return new THREE.Color(Math.random() * 0xFFFFFF);
 }
 
@@ -202,10 +207,10 @@ function getRandomPoint() {
 }
 
 function getRandomPointNear(p, minDist, maxDist) {
-    var x = Math.random() * (maxDist-minDist);
+    var x = Math.random() * (maxDist - minDist);
     if (Math.random() < .5) x *= -1;
     x += p.loc.x + minDist;
-    var y = Math.random() * (maxDist-minDist);
+    var y = Math.random() * (maxDist - minDist);
     if (Math.random() < .5) y *= -1;
     y += p.loc.y + minDist;
     return new Point(x, y);
@@ -244,15 +249,15 @@ function Simulation(n) {
         if (i % 4 == 0) {
             this.shapes.push(randomTriangle());
         } else {
-	    this.shapes.push(randomBezierShape());
+            this.shapes.push(randomBezierShape());
         }
     }
 }
 
 Simulation.prototype.drawShapes = function () {
     for (var i = 0; i < this.shapes.length; i++) {
-	this.shapes[i].handleBorder();
-	this.shapes[i].evolveColor();
+        this.shapes[i].handleBorder();
+        this.shapes[i].evolveColor();
         this.shapes[i].draw();
     }
 }
@@ -266,11 +271,11 @@ Simulation.prototype.updatePositions = function () {
 let animate;
 if (IS_KALEIDOSCOPE_SIM) {
     animate = function () {
-	if (levelTime == levelLength) {
-	    levelTime = 0;
-	    currentLevelColor = nextLevelColor;
-	}
-	levelTime += 1;
+        if (levelTime == levelLength) {
+            levelTime = 0;
+            currentLevelColor = nextLevelColor;
+        }
+        levelTime += 1;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         sim.drawShapes();
         sim.updatePositions();
@@ -278,14 +283,14 @@ if (IS_KALEIDOSCOPE_SIM) {
     }
 } else {
     animate = function () {
-	if (levelTime == levelLength) {
-	    currentLevel += 1;
-	    levelTime = 0;
-	}
-	levelTime += 1;
+        if (levelTime == levelLength) {
+            currentLevel += 1;
+            levelTime = 0;
+        }
+        levelTime += 1;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-	ctx.fillStyle = "#111";
+        ctx.fillStyle = "#111";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         sim.drawShapes();
         sim.updatePositions();
